@@ -1,5 +1,3 @@
-export {};
-
 const status = document.querySelector<HTMLElement>("#status");
 
 async function connectToBackend(attempt = 0): Promise<void> {
@@ -24,3 +22,6 @@ async function connectToBackend(attempt = 0): Promise<void> {
 }
 
 void connectToBackend();
+
+const app = <div>Hello World</div>;
+console.log(app);

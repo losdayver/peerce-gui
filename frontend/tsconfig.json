@@ -9,12 +9,15 @@
     "typeRoots": ["../node_modules/@types"],
     
     "module": "esnext",
-    "moduleResolution": "bundler",
+
+    "moduleDetection": "force",
 
     "noEmit": true,
     
     "strictNullChecks": true,
     "noImplicitAny": false,
+
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }
