@@ -1,19 +1,27 @@
+#![allow(unused_imports)]
+
 use std::{
-    process::Child,
+    path::PathBuf,
+    process::{Child, Command},
     sync::{Arc, Mutex},
 };
 
-use tauri::RunEvent;
+use tauri::{Manager, RunEvent};
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[allow(unused_variables)]
 pub fn run() {
     let backend: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
-    let _backend_on_setup = Arc::clone(&backend);
+    let backend_on_setup = Arc::clone(&backend);
 
+    
     let app = tauri::Builder::default()
-        .setup(move |_app| {
+        .setup(move |app| {
             #[cfg(not(debug_assertions))]
             {
-                let script = _app.path().resource_dir()?.join("backend/server.js");
+                let script = app.path().resource_dir()?.join("backend/server.js");
 
                 // Node.js cannot use Windows extended-length paths (`\\?\C:\...`)
                 // as an entrypoint, so pass it the equivalent regular drive path.
@@ -35,7 +43,7 @@ pub fn run() {
                     format!("Cannot start Node.js backend. Is Node.js installed? {error}")
                 })?;
 
-                *_backend_on_setup.lock().expect("backend lock is poisoned") = Some(child);
+                *backend_on_setup.lock().expect("backend lock is poisoned") = Some(child);
             }
 
             Ok(())
