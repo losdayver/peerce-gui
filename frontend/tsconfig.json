@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "../dist/frontend",
 
     "target": "esnext",
 
@@ -11,7 +11,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
 
-
+    "noEmit": false,
+    
     "strictNullChecks": true,
     "noImplicitAny": false,
 

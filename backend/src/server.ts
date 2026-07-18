@@ -4,7 +4,7 @@ import { extname, join, resolve } from "node:path";
 
 const host = "127.0.0.1";
 const port = 4310;
-const frontendRoot = resolve("dist/frontend");
+const distRoot = resolve("dist/frontend");
 
 const mimeTypes: Record<string, string> = {
   ".css": "text/css; charset=utf-8",
@@ -27,9 +27,9 @@ function sendJson(response: ServerResponse, status: number, data: unknown): void
 
 function sendFrontend(pathname: string, response: ServerResponse): void {
   const requestedPath = pathname === "/" ? "index.html" : pathname.slice(1);
-  const filePath = join(frontendRoot, requestedPath);
+  const filePath = join(distRoot, requestedPath);
 
-  if (!filePath.startsWith(frontendRoot) || !existsSync(filePath) || !statSync(filePath).isFile()) {
+  if (!filePath.startsWith(distRoot) || !existsSync(filePath) || !statSync(filePath).isFile()) {
     response.writeHead(404);
     response.end("Not found");
     return;

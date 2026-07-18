@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "../dist/backend",
 
     "target": "esnext",
 
@@ -19,6 +19,8 @@
     "noImplicitAny": false,
 
     "noEmitOnError": true,
+
+    "sourceMap": true,
   },
   "include": ["src"]
 }

@@ -11,7 +11,7 @@ module.exports = {
   entry: "./src/index.tsx",
 
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "../dist/frontend"),
     filename: "app.js",
     library: "Core",
     libraryTarget: "umd",
