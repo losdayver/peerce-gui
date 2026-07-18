@@ -11,12 +11,10 @@
     "module": "esnext",
     "moduleResolution": "bundler",
 
-    "noEmit": false,
+    "noEmit": true,
     
     "strictNullChecks": true,
     "noImplicitAny": false,
-
-    "noEmitOnError": true,
   },
   "include": ["src"]
 }

@@ -15,9 +15,7 @@
     "@tauri-apps/cli": "^2.0.0",
     "@types/node": "^24.13.3",
     "html-webpack-plugin": "^5.6.7",
-    "ts-loader": "^9.6.2",
     "typescript": "^6.0.2",
-    "webpack": "^5.108.4",
-    "webpack-cli": "^7.2.1"
+    "vite": "^8.1.5"
   }
 }
