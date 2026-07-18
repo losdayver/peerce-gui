@@ -1,0 +1,16 @@
+[package]
+name = "tauri-nodejs-frontend"
+version = "0.1.0"
+description = "Minimal Tauri shell for a TypeScript frontend and Node.js backend"
+edition = "2021"
+
+[lib]
+name = "tauri_nodejs_frontend_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+

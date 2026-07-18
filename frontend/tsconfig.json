@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "target": "esnext",
+
+    "lib": ["ES2024", "DOM"],
+    "typeRoots": ["../node_modules/@types"],
+    
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+
+    "noEmitOnError": true,
+  },
+  "include": ["src"]
+}
+

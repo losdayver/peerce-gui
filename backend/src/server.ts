@@ -1,0 +1,77 @@
+import { createReadStream, existsSync, statSync } from "node:fs";
+import { createServer, type ServerResponse } from "node:http";
+import { extname, join, resolve } from "node:path";
+
+const host = "127.0.0.1";
+const port = 4310;
+const frontendRoot = resolve("dist/frontend");
+
+const mimeTypes: Record<string, string> = {
+  ".css": "text/css; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8"
+};
+
+function allowFrontend(response: ServerResponse): void {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+}
+
+function sendJson(response: ServerResponse, status: number, data: unknown): void {
+  allowFrontend(response);
+  response.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  response.end(JSON.stringify(data));
+}
+
+function sendFrontend(pathname: string, response: ServerResponse): void {
+  const requestedPath = pathname === "/" ? "index.html" : pathname.slice(1);
+  const filePath = join(frontendRoot, requestedPath);
+
+  if (!filePath.startsWith(frontendRoot) || !existsSync(filePath) || !statSync(filePath).isFile()) {
+    response.writeHead(404);
+    response.end("Not found");
+    return;
+  }
+
+  response.writeHead(200, {
+    "Content-Type": mimeTypes[extname(filePath)] ?? "application/octet-stream"
+  });
+  createReadStream(filePath).pipe(response);
+}
+
+const server = createServer((request, response) => {
+  const pathname = new URL(request.url ?? "/", `http://${host}:${port}`).pathname;
+
+  if (request.method === "OPTIONS") {
+    allowFrontend(response);
+    response.writeHead(204);
+    response.end();
+    return;
+  }
+
+  if (request.method === "GET" && pathname === "/api/health") {
+    sendJson(response, 200, { ok: true, runtime: "node" });
+    return;
+  }
+
+  if (pathname.startsWith("/api/")) {
+    sendJson(response, 404, { error: "API route not found" });
+    return;
+  }
+
+  sendFrontend(pathname, response);
+});
+
+server.listen(port, host, () => {
+  console.log(`Node.js backend: http://${host}:${port}`);
+});
+
+function shutdown(): void {
+  server.close(() => process.exit(0));
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+

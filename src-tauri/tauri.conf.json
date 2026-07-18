@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Tauri Node.js Frontend",
+  "version": "0.1.0",
+  "identifier": "local.tauri-nodejs-frontend",
+  "build": {
+    "beforeDevCommand": "npm run dev:host",
+    "beforeBuildCommand": "npm run compile",
+    "devUrl": "http://127.0.0.1:4310",
+    "frontendDist": "../dist/frontend"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Tauri Node.js Frontend",
+        "width": 900,
+        "height": 600
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src http://127.0.0.1:4310; style-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "../dist/backend/server.js": "backend/server.js",
+      "../dist/backend/server.js.map": "backend/server.js.map",
+      "../backend/package.json": "backend/package.json"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+:root {
+  color: #e7e9ee;
+  background: #17191f;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  margin: 0;
+  place-items: center;
+}
+
+main {
+  text-align: center;
+}
+
+#status[data-state="ready"] {
+  color: #76d19a;
+}
+
+#status[data-state="error"] {
+  color: #ff8a8a;
+}
+
