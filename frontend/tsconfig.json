@@ -6,19 +6,22 @@
     "target": "esnext",
 
     "lib": ["ES2024", "DOM"],
-    "typeRoots": ["../node_modules/@types"],
-    
+    "typeRoots": ["../node_modules/@types", "../commonTypes"],
+
     "module": "esnext",
 
     "moduleDetection": "force",
 
     "noEmit": true,
-    
+
     "strictNullChecks": true,
     "noImplicitAny": false,
 
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+
+    "paths": {
+      "@commonTypes/*": ["../commonTypes/*"]
+    }
   },
   "include": ["src"]
 }
-

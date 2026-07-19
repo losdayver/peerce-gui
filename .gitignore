@@ -1,6 +1,7 @@
 node_modules/
 dist/
 src-tauri/target/
+misc/
 
 # Local environment
 .env
@@ -12,3 +13,5 @@ src-tauri/target/
 npm-debug.log*
 
 .agents/
+
+*.tgz

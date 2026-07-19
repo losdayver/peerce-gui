@@ -1,25 +1,17 @@
 :root {
-  color: #e7e9ee;
-  background: #17191f;
+  --main-bg: #17191f;
+  --secondary-bg: #282c39;
   font-family: system-ui, sans-serif;
+  box-sizing: border-box;
 }
 
 body {
-  display: grid;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0;
-  place-items: center;
+  color: azure;
 }
 
-main {
-  text-align: center;
+#root {
+  height: 100%;
+  background-color: var(--main-bg);
 }
-
-#status[data-state="ready"] {
-  color: #76d19a;
-}
-
-#status[data-state="error"] {
-  color: #ff8a8a;
-}
-

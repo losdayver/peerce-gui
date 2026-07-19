@@ -1,6 +1,18 @@
-import { createReadStream, existsSync, statSync } from "node:fs";
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  statSync,
+} from "node:fs";
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, resolve } from "node:path";
+import { WebSocketServer } from "ws";
+import { WssRouter } from "./wss-routet.js";
+import { SimplePeer } from "peerce";
+
+const logStream = createWriteStream("backend.log", { flags: "a" });
+process.stdout.write = logStream.write.bind(logStream);
+process.stderr.write = logStream.write.bind(logStream);
 
 const host = "127.0.0.1";
 const port = 4310;
@@ -10,39 +22,12 @@ const mimeTypes: Record<string, string> = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8"
+  ".json": "application/json; charset=utf-8",
 };
 
-function allowFrontend(response: ServerResponse): void {
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-}
-
-function sendJson(response: ServerResponse, status: number, data: unknown): void {
-  allowFrontend(response);
-  response.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
-  response.end(JSON.stringify(data));
-}
-
-function sendFrontend(pathname: string, response: ServerResponse): void {
-  const requestedPath = pathname === "/" ? "index.html" : pathname.slice(1);
-  const filePath = join(distRoot, requestedPath);
-
-  if (!filePath.startsWith(distRoot) || !existsSync(filePath) || !statSync(filePath).isFile()) {
-    response.writeHead(404);
-    response.end("Not found");
-    return;
-  }
-
-  response.writeHead(200, {
-    "Content-Type": mimeTypes[extname(filePath)] ?? "application/octet-stream"
-  });
-  createReadStream(filePath).pipe(response);
-}
-
 const server = createServer((request, response) => {
-  const pathname = new URL(request.url ?? "/", `http://${host}:${port}`).pathname;
+  const pathname = new URL(request.url ?? "/", `http://${host}:${port}`)
+    .pathname;
 
   if (request.method === "OPTIONS") {
     allowFrontend(response);
@@ -52,17 +37,47 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === "GET" && pathname === "/api/health") {
-    sendJson(response, 200, { ok: true, runtime: "node" });
-    return;
-  }
-
-  if (pathname.startsWith("/api/")) {
-    sendJson(response, 404, { error: "API route not found" });
+    response.writeHead(200);
+    response.end();
     return;
   }
 
   sendFrontend(pathname, response);
 });
+
+const wss = new WebSocketServer({ server });
+
+const wssRouter = new WssRouter(wss);
+
+function allowFrontend(response: ServerResponse): void {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+}
+
+/** Files handler */
+function sendFrontend(pathname: string, response: ServerResponse): void {
+  const requestedPath = pathname === "/" ? "index.html" : pathname.slice(1);
+  const filePath = join(distRoot, requestedPath);
+
+  if (
+    !filePath.startsWith(distRoot) ||
+    !existsSync(filePath) ||
+    !statSync(filePath).isFile()
+  ) {
+    response.writeHead(404);
+    response.end("Not found");
+    return;
+  }
+
+  response.writeHead(200, {
+    "Content-Type": mimeTypes[extname(filePath)] ?? "application/octet-stream",
+  });
+  createReadStream(filePath).pipe(response);
+}
 
 server.listen(port, host, () => {
   console.log(`Node.js backend: http://${host}:${port}`);
@@ -74,4 +89,3 @@ function shutdown(): void {
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
-

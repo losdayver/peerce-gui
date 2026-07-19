@@ -6,14 +6,15 @@
   "build": {
     "beforeDevCommand": "npm run dev:host",
     "beforeBuildCommand": "npm run compile",
-    "devUrl": "http://127.0.0.1:4310/static/index.html",
+    "devUrl": "http://127.0.0.1:4310",
     "frontendDist": "../dist/frontend"
   },
   "app": {
     "windows": [
       {
         "label": "main",
-        "title": "Tauri Node.js Frontend",
+        "title": "Peerce",
+        "url": "static/index.html",
         "width": 900,
         "height": 600
       }
@@ -24,9 +25,7 @@
   },
   "bundle": {
     "active": true,
-    "icon": [
-      "icons/icon.ico"
-    ],
+    "icon": ["icons/icon.ico"],
     "resources": {
       "../dist/backend/server.js": "backend/server.js",
       "../dist/backend/server.js.map": "backend/server.js.map",

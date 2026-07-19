@@ -21,6 +21,10 @@
     "noEmitOnError": true,
 
     "sourceMap": true,
+
+    "paths": {
+      "@commonTypes/*": ["../commonTypes/*"]
+    }
   },
   "include": ["src"]
 }
