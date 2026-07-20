@@ -7,8 +7,7 @@ import {
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { WebSocketServer } from "ws";
-import { WssRouter } from "./wss-routet.js";
-import { SimplePeer } from "peerce";
+import { WssRouter } from "./wss-router.js";
 
 const logStream = createWriteStream("backend.log", { flags: "a" });
 process.stdout.write = logStream.write.bind(logStream);

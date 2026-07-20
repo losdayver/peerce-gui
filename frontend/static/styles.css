@@ -5,10 +5,15 @@
   box-sizing: border-box;
 }
 
+html {
+  background-color: var(--main-bg);
+}
+
 body {
   height: 100vh;
   margin: 0;
   color: azure;
+  background-color: var(--main-bg);
 }
 
 #root {

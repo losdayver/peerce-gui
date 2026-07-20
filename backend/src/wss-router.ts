@@ -1,9 +1,12 @@
 import { WebSocketServer } from "ws";
 import type {
+  WSAddPeerMessage,
   WSGenericMessage,
   WSMessages,
   WSTestMessage,
+  WSUpdatePeerListMessage,
 } from "@commonTypes/ws-message.js";
+import { SimplePeer } from "peerce";
 
 type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
   webSocket: WebSocket,
@@ -37,14 +40,20 @@ export class WssRouter {
     this.wsSet.delete(webSocket);
   };
 
-  wsTestMessage: WsMessageHandler<WSTestMessage> = (ws, message) => {
-    if (message.payload == "ping")
-      ws.send(
-        JSON.stringify({
-          type: "test",
-          payload: "pong",
-        } satisfies WSTestMessage)
-      );
+  sendMessage = (message: WSMessages) => {
+    this.wsSet.forEach((ws) => ws.send(JSON.stringify(message)));
+  };
+
+  peerMap: Record<string, any> = {};
+  addPeer: WsMessageHandler<WSAddPeerMessage> = (ws, message) => {
+    const peer = new SimplePeer(message.payload);
+    this.peerMap[message.payload.distantTag] = peer;
+    this.sendMessage({
+      type: "update-peer-list",
+      payload: Object.entries(this.peerMap).map(([tag, peer]) => ({
+        tag: tag ?? "unknown",
+      })),
+    } as any);
   };
 
   private wsMessageTypeHandlerMap: Partial<{
@@ -52,7 +61,15 @@ export class WssRouter {
       Extract<WSMessages, { type: Type }>
     >;
   }> = {
-    test: this.wsTestMessage,
+    "add-peer": this.addPeer,
+    "request-update-peer-list": () => {
+      this.sendMessage({
+        type: "update-peer-list",
+        payload: Object.entries(this.peerMap).map(([tag, peer]) => ({
+          tag: tag ?? "unknown",
+        })),
+      } as any);
+    },
   };
 
   constructor(private wss: WebSocketServer) {

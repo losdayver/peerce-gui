@@ -1,3 +1,111 @@
 .content-window {
   width: 100%;
+  min-width: 0;
+  padding: 18px;
+  display: flex;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(94, 132, 255, 0.08),
+      transparent 30%
+    ),
+    var(--main-bg);
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.content-wrap {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(43, 48, 61, 0.96),
+    rgba(31, 34, 44, 0.98)
+  );
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
+}
+
+.content-wrap__header {
+  min-height: 56px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: #f8fbff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  background-color: rgba(255, 255, 255, 0.025);
+  box-sizing: border-box;
+}
+
+.content-wrap__header-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content-wrap__header-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.content-wrap__header-action {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: rgba(248, 251, 255, 0.9);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.content-wrap__header-action:hover,
+.content-wrap__header-action:focus-visible {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.09);
+  outline: none;
+}
+
+.content-wrap__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 720px) {
+  .content-window {
+    padding: 14px;
+  }
+
+  .content-wrap__header {
+    min-height: 50px;
+    padding: 0 16px;
+    font-size: 16px;
+  }
+
+  .content-wrap__body {
+    padding: 16px;
+  }
 }
