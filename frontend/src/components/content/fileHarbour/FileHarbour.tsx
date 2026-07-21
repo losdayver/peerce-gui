@@ -1,11 +1,16 @@
 import { useEffect, useContext, useState } from "react";
-import type { WSUpdatePeerListMessage } from "@commonTypes/ws-message.js";
+import type {
+  WSAddPeerMessage,
+  WSUpdatePeerListMessage,
+} from "@commonTypes/ws-message.js";
 import { ContentWindowHeaderAction } from "../../SideBar";
 import { wsClientContext } from "../../../interop/ws-client";
 import { FileHarbourSidebarItemProps } from "./FileHarbourSidebarItem";
 import { FileHarbourSidebarContext } from "./FileHarbourContext";
 import { FileHarbourSidebar } from "./FileHarbourSideBar";
 import { FileHarbourWorkspace } from "./FileHarbourWorkspace";
+import { Modal } from "../../Modal";
+import { Form } from "../../form/Form";
 
 // const initialPeers: FileHarbourSidebarItemProps[] = [
 //   {
@@ -81,13 +86,15 @@ export const FileHarbour: React.FC<any> = () => {
   >(null);
   const wsClientRef = useContext(wsClientContext);
   const wsClient = wsClientRef.current!;
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     fileHarbourHeaderActions[0].fn = () => {
-      wsClient.addPeer({
-        type: "add-peer",
-        payload: {} as any,
-      });
+      // wsClient.addPeer({
+      //   type: "add-peer",
+      //   payload: {} as any,
+      // });
+      setModalOpen(true);
     };
 
     const updatePeerList = (event: Event) => {
@@ -129,6 +136,56 @@ export const FileHarbour: React.FC<any> = () => {
           peerItems.find((peer) => peer.itemKey == activePeerKey) ?? null,
       }}
     >
+      <Modal
+        title="Add new peer"
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      >
+        <Form
+          schema={{
+            selfTag: { title: "Self tag", component: "input", required: true },
+            distantTag: {
+              title: "Peer tag",
+              component: "input",
+              divideAfter: true,
+              required: true,
+            },
+            selfAddr: {
+              title: "Self address",
+              component: "input",
+              placeholder: "XXX.XXX.XXX.XXX",
+            },
+            selfPort: {
+              title: "Self port",
+              component: "input",
+              divideAfter: true,
+            },
+            relayAddr: {
+              title: "Relay address",
+              component: "input",
+              placeholder: "XXX.XXX.XXX.XXX",
+              required: true,
+            },
+            relayPort: {
+              title: "Relay port",
+              component: "input",
+              divideAfter: true,
+              required: true,
+            },
+            doNotAcceptFiles: {
+              title: "Only allow file send",
+              component: "checkbox",
+            },
+          }}
+          onConfirm={(data) => {
+            setModalOpen(false);
+            wsClient.addPeer({
+              type: "add-peer",
+              payload: data as any,
+            });
+          }}
+        />
+      </Modal>
       <div className="file-harbour">
         <FileHarbourSidebar items={peerItems} />
         <FileHarbourWorkspace />

@@ -62,31 +62,6 @@
   gap: 8px;
 }
 
-.content-wrap__header-action {
-  min-height: 32px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: rgba(248, 251, 255, 0.9);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  background-color: rgba(255, 255, 255, 0.055);
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    color 150ms ease;
-}
-
-.content-wrap__header-action:hover,
-.content-wrap__header-action:focus-visible {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.15);
-  background-color: rgba(255, 255, 255, 0.09);
-  outline: none;
-}
-
 .content-wrap__body {
   flex: 1;
   min-height: 0;

@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Empty } from "./misc";
 import { ContentWindowHeaderAction, sidebarContext } from "./SideBar";
+import { Button } from "./intrinsic/Button";
 
 export const ContentWindow: React.FC = () => {
   const sideBarCtx = useContext(sidebarContext);
@@ -36,14 +37,12 @@ export const ContentWrap: React.FC<
         {!!headerActions?.length && (
           <div className="content-wrap__header-actions">
             {headerActions.map((action) => (
-              <button
-                className="content-wrap__header-action"
+              <Button
                 key={action.title}
                 onClick={() => action.fn?.()}
-                type="button"
               >
                 {action.title}
-              </button>
+              </Button>
             ))}
           </div>
         )}
