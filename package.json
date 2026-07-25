@@ -9,6 +9,7 @@
     "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
     "compile:backend": "npx tsc -p backend/tsconfig.json",
     "dev:host": "npm run compile && node dist/backend/server.js",
+    "watch:host": "nodemon --watch backend npm run compile:backend && node dist/backend/server.js",
     "dev": "tauri dev",
     "build": "tauri build"
   },
