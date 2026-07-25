@@ -10,7 +10,7 @@
 
     "lib": ["esnext"],
     "types": ["node"],
-    "typeRoots": ["../node_modules/@types"],
+    "typeRoots": ["../node_modules/@types", "../commonTypes"],
 
     "esModuleInterop": true,
     "resolveJsonModule": true,

@@ -1,10 +1,8 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { SideBar, sidebarContext, SideBarItemProps } from "./SideBar";
 import { ContentWindow } from "./ContentWindow";
-import {
-  FileHarbour,
-  fileHarbourHeaderActions,
-} from "./content/fileHarbour/FileHarbour";
+import { FileHarbour } from "./content/fileHarbour/FileHarbour";
+import { fileHarbourHeaderActions } from "./content/fileHarbour/FileHarbourAddPeer";
 import { WsClient, wsClientContext } from "../interop/ws-client";
 import { Empty } from "./misc";
 

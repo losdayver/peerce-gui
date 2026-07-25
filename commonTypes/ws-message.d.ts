@@ -1,3 +1,5 @@
+import { FileHarborState } from "./file-harbour.js";
+
 export interface WSGenericMessage {
   type: string;
   payload?: any;
@@ -6,7 +8,9 @@ export interface WSGenericMessage {
 export type WSMessages =
   | WSTestMessage
   | WSAddPeerMessage
-  | WSRequestUpdatePeerListMessage;
+  | WSRequestUpdatePeerListMessage
+  | WSRemovePeerMessage
+  | WSFileHarbourState;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -17,7 +21,7 @@ export interface WSTestMessage {
 
 //#region client => server
 export interface WSAddPeerMessage {
-  type: "add-peer";
+  type: "file-harbour-register-peer";
   payload: {
     relayAddr: string;
     relayPort: number;
@@ -28,14 +32,21 @@ export interface WSAddPeerMessage {
   };
 }
 
+export interface WSRemovePeerMessage {
+  type: "file-harbour-unregister-peer";
+  payload: {
+    tag: string;
+  };
+}
+
 export interface WSRequestUpdatePeerListMessage {
-  type: "request-update-peer-list";
+  type: "file-harbour-request-state";
 }
 //#endregion
 
 //#region server => client
-export interface WSUpdatePeerListMessage {
-  type: "update-peer-list";
-  payload: { tag: string }[];
+export interface WSFileHarbourState {
+  type: "file-harbour-state";
+  payload: FileHarborState;
 }
 //#endregion

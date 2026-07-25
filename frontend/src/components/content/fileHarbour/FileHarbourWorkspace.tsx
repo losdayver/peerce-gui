@@ -1,14 +1,15 @@
-import { useContext } from "react";
 import { Empty } from "../../misc";
-import { FileHarbourSidebarContext } from "./FileHarbourContext";
+import { useFileHarbour } from "./FileHarbourContext";
 
 export const FileHarbourWorkspace: React.FC = () => {
-  const fileHarbourSidebarCtx = useContext(FileHarbourSidebarContext);
-  const activePeer = fileHarbourSidebarCtx?.getActiveItem();
+  const { state, activePeerTag } = useFileHarbour();
+  const activePeer = state.items.find(
+    (peer) => peer.tag === activePeerTag
+  );
 
   return (
     <section className="file-harbour__workspace">
-      <Empty>{activePeer?.name ?? "Choose existing or add new peer"}</Empty>
+      <Empty>{activePeer?.tag ?? "Choose existing or add new peer"}</Empty>
     </section>
   );
 };

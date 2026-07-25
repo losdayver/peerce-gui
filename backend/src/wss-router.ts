@@ -1,12 +1,6 @@
 import { WebSocketServer } from "ws";
-import type {
-  WSAddPeerMessage,
-  WSGenericMessage,
-  WSMessages,
-  WSTestMessage,
-  WSUpdatePeerListMessage,
-} from "@commonTypes/ws-message.js";
-import { SimplePeer } from "peerce";
+import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
+import { FileHarbor } from "./file-harbour.js";
 
 type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
   webSocket: WebSocket,
@@ -15,6 +9,7 @@ type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
 
 export class WssRouter {
   private wsSet = new Set<WebSocket>();
+  private fileHarbour = new FileHarbor();
 
   private genericMessageHandler = async (webSocket: WebSocket, message) => {
     console.log("received generic message", message);
@@ -40,20 +35,9 @@ export class WssRouter {
     this.wsSet.delete(webSocket);
   };
 
-  sendMessage = (message: WSMessages) => {
+  sendMessage = (message: WSMessages, ws?: WebSocket) => {
+    const wsList = ws ? [ws] : this.wsSet;
     this.wsSet.forEach((ws) => ws.send(JSON.stringify(message)));
-  };
-
-  peerMap: Record<string, any> = {};
-  addPeer: WsMessageHandler<WSAddPeerMessage> = (ws, message) => {
-    const peer = new SimplePeer(message.payload);
-    this.peerMap[message.payload.distantTag] = peer;
-    this.sendMessage({
-      type: "update-peer-list",
-      payload: Object.entries(this.peerMap).map(([tag, peer]) => ({
-        tag: tag ?? "unknown",
-      })),
-    } as any);
   };
 
   private wsMessageTypeHandlerMap: Partial<{
@@ -61,14 +45,13 @@ export class WssRouter {
       Extract<WSMessages, { type: Type }>
     >;
   }> = {
-    "add-peer": this.addPeer,
-    "request-update-peer-list": () => {
-      this.sendMessage({
-        type: "update-peer-list",
-        payload: Object.entries(this.peerMap).map(([tag, peer]) => ({
-          tag: tag ?? "unknown",
-        })),
-      } as any);
+    "file-harbour-register-peer": (_, message) =>
+      this.fileHarbour.registerPeer(message.payload),
+    "file-harbour-unregister-peer": (_, message) =>
+      this.fileHarbour.unregisterPeer(message.payload.tag),
+    "file-harbour-request-state": (ws) => {
+      const state = this.fileHarbour.getConstructedState();
+      this.sendMessage({ type: "file-harbour-state", payload: state });
     },
   };
 

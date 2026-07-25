@@ -1,29 +1,22 @@
-import { useContext } from "react";
 import {
   FileHarbourSidebarItem,
-  FileHarbourSidebarItemProps,
 } from "./FileHarbourSidebarItem";
-import { FileHarbourSidebarContext } from "./FileHarbourContext";
+import { useFileHarbour } from "./FileHarbourContext";
 
-export interface FileHarbourSidebarProps {
-  items?: FileHarbourSidebarItemProps[];
-}
-
-export const FileHarbourSidebar: React.FC<FileHarbourSidebarProps> = ({ items }) => {
-  const fileHarbourSidebarCtx = useContext(FileHarbourSidebarContext);
-  const activeItem = fileHarbourSidebarCtx?.getActiveItemKey();
+export const FileHarbourSidebar: React.FC = () => {
+  const { state, activePeerTag, setActivePeerTag } = useFileHarbour();
 
   return (
     <aside className="file-harbour__sidebar">
       <div className="file-harbour__sidebar-header">Peers</div>
-      {!!items?.length && (
+      {state.items.length > 0 && (
         <div className="file-harbour__peer-list">
-          {items.map((peer) => (
+          {state.items.map((peer) => (
             <FileHarbourSidebarItem
               {...peer}
-              active={peer.itemKey == activeItem}
-              key={peer.itemKey}
-              onClick={() => fileHarbourSidebarCtx?.setActiveItem(peer.itemKey)}
+              active={peer.tag === activePeerTag}
+              key={peer.tag}
+              onClick={() => setActivePeerTag(peer.tag)}
             />
           ))}
         </div>

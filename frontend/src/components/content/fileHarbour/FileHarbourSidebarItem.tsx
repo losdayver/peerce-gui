@@ -1,16 +1,13 @@
-export interface FileHarbourSidebarItemProps {
-  initials: string;
-  name: string;
-  itemKey: string;
-  status: "connected" | "syncing" | "idle" | "offline" | "pending";
+import { FileHarborStateItem } from "@commonTypes/file-harbour";
+
+export interface FileHarbourSidebarItemProps extends FileHarborStateItem {
   active?: boolean;
   onClick?: () => void;
 }
 
 export const FileHarbourSidebarItem: React.FC<FileHarbourSidebarItemProps> = ({
-  initials,
-  name,
-  status,
+  tag,
+  state,
   active,
   onClick,
 }) => {
@@ -20,13 +17,13 @@ export const FileHarbourSidebarItem: React.FC<FileHarbourSidebarItemProps> = ({
       onClick={() => onClick?.()}
       type="button"
     >
-      <span className="file-harbour__peer-icon">{initials}</span>
+      <span className="file-harbour__peer-icon">{tag.slice(0, 2)}</span>
       <span className="file-harbour__peer-meta">
-        <span className="file-harbour__peer-name">{name}</span>
+        <span className="file-harbour__peer-name">{tag}</span>
         <span
-          className={`file-harbour__peer-status file-harbour__peer-status--${status}`}
+          className={`file-harbour__peer-status file-harbour__peer-status--${state}`}
         >
-          {status}
+          {state}
         </span>
       </span>
     </button>
