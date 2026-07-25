@@ -72,7 +72,11 @@
   color: inherit;
   text-align: left;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.025)
+    ),
     rgba(35, 39, 50, 0.72);
   cursor: pointer;
   box-sizing: border-box;
@@ -95,7 +99,11 @@
 .file-harbour__peer--active {
   border-color: rgba(118, 228, 180, 0.36);
   background:
-    linear-gradient(180deg, rgba(118, 228, 180, 0.12), rgba(255, 255, 255, 0.035)),
+    linear-gradient(
+      180deg,
+      rgba(118, 228, 180, 0.12),
+      rgba(255, 255, 255, 0.035)
+    ),
     rgba(35, 39, 50, 0.9);
   box-shadow:
     inset 3px 0 0 rgba(118, 228, 180, 0.74),
@@ -185,6 +193,149 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
+  padding: 32px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.file-harbour__workspace-peer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.file-harbour__workspace-peer h2,
+.file-harbour__transfers h3 {
+  margin: 0;
+  color: #f8fbff;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.file-harbour__workspace-avatar {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(118, 228, 180, 0.42);
+  border-radius: 50%;
+  color: #f8fbff;
+  font-size: 20px;
+  font-weight: 800;
+  background: rgba(118, 228, 180, 0.1);
+}
+
+.file-harbour__workspace-status {
+  margin: 7px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(232, 238, 247, 0.62);
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.file-harbour__workspace-status::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.file-harbour__workspace-status--connected {
+  color: #76e4b4;
+}
+
+.file-harbour__workspace-status--connecting {
+  color: #82b7ff;
+}
+
+.file-harbour__workspace-actions {
+  padding: 24px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.file-harbour__transfers {
+  padding-top: 26px;
+}
+
+.file-harbour__transfers-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.file-harbour__transfers-header h3 {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.file-harbour__transfers-header span,
+.file-harbour__transfers-empty {
+  margin: 0;
+  color: rgba(232, 238, 247, 0.5);
+  font-size: 13px;
+}
+
+.file-harbour__transfers-list {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.file-harbour__transfer {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.2fr) 46px;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.file-harbour__transfer-name {
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(248, 251, 255, 0.9);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-harbour__transfer-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.file-harbour__transfer-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5d8dff, #76e4b4);
+}
+
+.file-harbour__transfer-percent {
+  color: rgba(232, 238, 247, 0.62);
+  font-size: 12px;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .file-harbour__workspace {
+    padding: 22px;
+  }
+
+  .file-harbour__transfer {
+    grid-template-columns: minmax(100px, 1fr) minmax(80px, 1fr) 40px;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 760px) {

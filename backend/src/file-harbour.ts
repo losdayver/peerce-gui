@@ -2,9 +2,9 @@ import type { FileHarborState } from "@commonTypes/file-harbour.js";
 import { WSAddPeerMessage } from "@commonTypes/ws-message.js";
 
 export class FileHarbor {
-  registerPeer = (payload: WSAddPeerMessage["payload"]) => {};
-  unregisterPeer = (tag: string) => {};
-  getConstructedState = (): FileHarborState => ({
+  constructor(private sendUpdateMessage: () => void) {}
+
+  private state: FileHarborState = {
     items: [
       {
         tag: "anna-keller",
@@ -22,5 +22,12 @@ export class FileHarbor {
         transfers: [],
       },
     ],
-  });
+  };
+
+  registerPeer = (payload: WSAddPeerMessage["payload"]) => {};
+  unregisterPeer = (tag: string): void => {
+    this.state.items = this.state.items.filter((item) => item.tag !== tag);
+    this.sendUpdateMessage();
+  };
+  getConstructedState = (): FileHarborState => this.state;
 }

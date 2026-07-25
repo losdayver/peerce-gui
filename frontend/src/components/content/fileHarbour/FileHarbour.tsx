@@ -8,7 +8,7 @@ import { wsClientContext } from "../../../interop/ws-client";
 import { FileHarbourAddPeer } from "./FileHarbourAddPeer";
 import { FileHarbourContext } from "./FileHarbourContext";
 import { FileHarbourSidebar } from "./FileHarbourSideBar";
-import { FileHarbourWorkspace } from "./FileHarbourWorkspace";
+import { FileHarbourWorkspace } from "./workspace/FileHarbourWorkspace";
 
 function isFileHarbourState(
   message: WSGenericMessage
