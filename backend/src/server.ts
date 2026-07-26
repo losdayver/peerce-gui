@@ -7,7 +7,7 @@ import {
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { WebSocketServer } from "ws";
-import { WssRouter } from "./wss-router.js";
+import { WssRouter } from "./wssRouter.js";
 
 const logStream = createWriteStream("backend.log", { flags: "a" });
 process.stdout.write = logStream.write.bind(logStream);

@@ -1,7 +1,7 @@
 import {
   FileHarbourSidebarItem,
-} from "./FileHarbourSidebarItem";
-import { useFileHarbour } from "./FileHarbourContext";
+} from "./fileHarbourSidebarItem";
+import { useFileHarbour } from "./fileHarbourContext";
 
 export const FileHarbourSidebar: React.FC = () => {
   const { state, activePeerTag, setActivePeerTag } = useFileHarbour();

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Empty } from "./misc";
-import { ContentWindowHeaderAction, sidebarContext } from "./SideBar";
-import { Button } from "./intrinsic/Button";
+import { ContentWindowHeaderAction, sidebarContext } from "./sideBar";
+import { Button } from "./intrinsic/button";
 
 export const ContentWindow: React.FC = () => {
   const sideBarCtx = useContext(sidebarContext);

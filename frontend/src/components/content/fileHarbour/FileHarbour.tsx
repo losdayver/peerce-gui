@@ -4,11 +4,11 @@ import type {
   WSGenericMessage,
 } from "@commonTypes/ws-message.js";
 import type { FileHarborState } from "@commonTypes/file-harbour.js";
-import { wsClientContext } from "../../../interop/ws-client";
-import { FileHarbourAddPeer } from "./FileHarbourAddPeer";
-import { FileHarbourContext } from "./FileHarbourContext";
-import { FileHarbourSidebar } from "./FileHarbourSideBar";
-import { FileHarbourWorkspace } from "./workspace/FileHarbourWorkspace";
+import { wsClientContext } from "../../../interop/wsClient";
+import { FileHarbourAddPeer } from "./fileHarbourAddPeer";
+import { FileHarbourContext } from "./fileHarbourContext";
+import { FileHarbourSidebar } from "./fileHarbourSideBar";
+import { FileHarbourWorkspace } from "./workspace/fileHarbourWorkspace";
 
 function isFileHarbourState(
   message: WSGenericMessage

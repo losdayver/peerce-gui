@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { ItemDescriptor } from "./Form";
-import { Input } from "../intrinsic/Input";
-import { Checkbox } from "../intrinsic/Checkbox";
+import { ItemDescriptor } from "./form";
+import { Input } from "../intrinsic/input";
+import { Checkbox } from "../intrinsic/checkbox";
 
 export interface FormItemProps {
   title: string;

@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
-import type { WSAddPeerMessage } from "@commonTypes/ws-message.js";
-import { wsClientContext } from "../../../interop/ws-client";
-import type { ContentWindowHeaderAction } from "../../SideBar";
-import { Modal } from "../../Modal";
+import type { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
+import { wsClientContext } from "../../../interop/wsClient";
+import type { ContentWindowHeaderAction } from "../../sideBar";
+import { Modal } from "../../modal";
 import {
   Form,
   type FormSchema,
   type InferDataFromSchema,
-} from "../../form/Form";
+} from "../../form/form";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "Add new peer", fn: null },
@@ -53,7 +53,7 @@ type FormData = InferDataFromSchema<typeof formSchema>;
 
 function toRegisterPeerMessage(
   data: Partial<FormData>
-): WSAddPeerMessage | null {
+): WSFHRegisterPeerMessage | null {
   const relayPort = Number(data.relayPort);
   const selfPort = data.selfPort === undefined ? 0 : Number(data.selfPort);
 

@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
 import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
-import { FileHarbor } from "./file-harbour.js";
+import { FileHarbor } from "./fileHarbour.js";
 
 type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
   webSocket: WebSocket,

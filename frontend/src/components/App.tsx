@@ -1,9 +1,9 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import { SideBar, sidebarContext, SideBarItemProps } from "./SideBar";
-import { ContentWindow } from "./ContentWindow";
-import { FileHarbour } from "./content/fileHarbour/FileHarbour";
-import { fileHarbourHeaderActions } from "./content/fileHarbour/FileHarbourAddPeer";
-import { WsClient, wsClientContext } from "../interop/ws-client";
+import { SideBar, sidebarContext, SideBarItemProps } from "./sideBar";
+import { ContentWindow } from "./contentWindow";
+import { FileHarbour } from "./content/fileHarbour/fileHarbour";
+import { fileHarbourHeaderActions } from "./content/fileHarbour/fileHarbourAddPeer";
+import { WsClient, wsClientContext } from "../interop/wsClient";
 import { Empty } from "./misc";
 
 export const App: React.FC = () => {

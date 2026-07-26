@@ -7,9 +7,10 @@ export interface WSGenericMessage {
 
 export type WSMessages =
   | WSTestMessage
-  | WSAddPeerMessage
-  | WSRequestUpdatePeerListMessage
-  | WSRemovePeerMessage
+  | WSFHRegisterPeerMessage
+  | WSFHUnregisterPeerMessage
+  | WSFHRequestStateMessage
+  | WSFHAddTransferMessage
   | WSFileHarbourState;
 
 //#region mutual exchange
@@ -20,7 +21,7 @@ export interface WSTestMessage {
 //#endregion
 
 //#region client => server
-export interface WSAddPeerMessage {
+export interface WSFHRegisterPeerMessage {
   type: "file-harbour-register-peer";
   payload: {
     relayAddr: string;
@@ -32,14 +33,22 @@ export interface WSAddPeerMessage {
   };
 }
 
-export interface WSRemovePeerMessage {
+export interface WSFHUnregisterPeerMessage {
   type: "file-harbour-unregister-peer";
   payload: {
     tag: string;
   };
 }
 
-export interface WSRequestUpdatePeerListMessage {
+export interface WSFHAddTransferMessage {
+  type: "file-harbour-add-transfer";
+  payload: {
+    tag: string;
+    fullFilePath: string;
+  };
+}
+
+export interface WSFHRequestStateMessage {
   type: "file-harbour-request-state";
 }
 //#endregion

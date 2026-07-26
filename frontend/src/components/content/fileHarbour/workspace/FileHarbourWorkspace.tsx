@@ -1,8 +1,8 @@
 import { Empty } from "../../../misc";
-import { Button } from "../../../intrinsic/Button";
-import { useFileHarbour } from "../FileHarbourContext";
+import { Button } from "../../../intrinsic/button";
+import { useFileHarbour } from "../fileHarbourContext";
 import { useContext } from "react";
-import { wsClientContext } from "../../../../interop/ws-client";
+import { wsClientContext } from "../../../../interop/wsClient";
 
 function getInitials(tag: string): string {
   return tag
@@ -45,7 +45,6 @@ export const FileHarbourWorkspace: React.FC = () => {
       </header>
 
       <div className="file-harbour__workspace-actions">
-        <Button disabled>📩 Send data</Button>
         <Button
           onClick={() => {
             wsClient.sendMessage({
@@ -56,7 +55,16 @@ export const FileHarbourWorkspace: React.FC = () => {
         >
           🔌 Disconnect
         </Button>
-        <Button disabled>➕ Add transfer</Button>
+        <Button
+          onClick={() => {
+            wsClient.sendMessage({
+              type: "file-harbour-add-transfer",
+              payload: { tag: activePeer.tag },
+            });
+          }}
+        >
+          ➕ Add transfer
+        </Button>
       </div>
 
       <section

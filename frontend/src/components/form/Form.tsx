@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { componentFactory, FormItem } from "./FormItem";
-import { InputProps } from "../intrinsic/Input";
-import { CheckboxProps } from "../intrinsic/Checkbox";
-import { Button } from "../intrinsic/Button";
+import { componentFactory, FormItem } from "./formItem";
+import { InputProps } from "../intrinsic/input";
+import { CheckboxProps } from "../intrinsic/checkbox";
+import { Button } from "../intrinsic/button";
 
 export type ItemDescriptor = (InputItemDescriptor | CheckBoxItemDescriptor) & {
   title: string;

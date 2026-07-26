@@ -1,5 +1,5 @@
 import type { FileHarborState } from "@commonTypes/file-harbour.js";
-import { WSAddPeerMessage } from "@commonTypes/ws-message.js";
+import { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
 
 export class FileHarbor {
   constructor(private sendUpdateMessage: () => void) {}
@@ -24,7 +24,7 @@ export class FileHarbor {
     ],
   };
 
-  registerPeer = (payload: WSAddPeerMessage["payload"]) => {};
+  registerPeer = (payload: WSFHRegisterPeerMessage["payload"]) => {};
   unregisterPeer = (tag: string): void => {
     this.state.items = this.state.items.filter((item) => item.tag !== tag);
     this.sendUpdateMessage();
