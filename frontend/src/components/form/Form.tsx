@@ -2,9 +2,14 @@ import { useState } from "react";
 import { componentFactory, FormItem } from "./formItem";
 import { InputProps } from "../intrinsic/input";
 import { CheckboxProps } from "../intrinsic/checkbox";
+import { FileInputProps } from "../intrinsic/fileInput";
 import { Button } from "../intrinsic/button";
 
-export type ItemDescriptor = (InputItemDescriptor | CheckBoxItemDescriptor) & {
+export type ItemDescriptor = (
+  | InputItemDescriptor
+  | CheckBoxItemDescriptor
+  | FileInputItemDescriptor
+) & {
   title: string;
   required?: boolean;
   divideAfter?: boolean;
@@ -19,9 +24,14 @@ interface CheckBoxItemDescriptor extends CheckboxProps {
   component: "checkbox";
 }
 
+interface FileInputItemDescriptor extends Omit<FileInputProps, "onPathChange"> {
+  component: "file";
+}
+
 interface ComponentToTypeMap {
   input: string;
   checkbox: boolean;
+  file: string;
 }
 
 export type FormSchema = {
@@ -64,7 +74,7 @@ export const Form = <Schema extends FormSchema>({
           key={fldKey}
           divideAfter={descriptor.divideAfter}
         >
-          {componentFactory(descriptor, (val: any) =>
+          {componentFactory(descriptor, formData[fldKey], (val: any) =>
             setFormData((prev) => {
               return { ...prev, [fldKey]: val };
             })

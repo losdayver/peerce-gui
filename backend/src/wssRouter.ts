@@ -52,6 +52,11 @@ export class WssRouter {
       this.fileHarbour.registerPeer(message.payload),
     "file-harbour-unregister-peer": (_, message) =>
       this.fileHarbour.unregisterPeer(message.payload.tag),
+    "file-harbour-add-transfer": (_, message) =>
+      this.fileHarbour.addTransfer(
+        message.payload.tag,
+        message.payload.fullFilePath
+      ),
     "file-harbour-request-state": (ws) => {
       const state = this.fileHarbour.getConstructedState();
       this.sendMessage({ type: "file-harbour-state", payload: state });

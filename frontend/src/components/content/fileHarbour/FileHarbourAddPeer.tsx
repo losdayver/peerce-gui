@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
-import { wsClientContext } from "../../../interop/wsClient";
 import type { ContentWindowHeaderAction } from "../../sideBar";
 import { Modal } from "../../modal";
+import { useFileHarbour } from "./fileHarbourContext";
 import {
   Form,
   type FormSchema,
@@ -51,42 +51,22 @@ const formSchema = {
 
 type FormData = InferDataFromSchema<typeof formSchema>;
 
-function toRegisterPeerMessage(
+function toRegisterPeerPayload(
   data: Partial<FormData>
-): WSFHRegisterPeerMessage | null {
-  const relayPort = Number(data.relayPort);
-  const selfPort = data.selfPort === undefined ? 0 : Number(data.selfPort);
-
-  if (
-    !data.selfTag ||
-    !data.distantTag ||
-    !data.relayAddr ||
-    !Number.isInteger(relayPort) ||
-    relayPort < 1 ||
-    relayPort > 65_535 ||
-    !Number.isInteger(selfPort) ||
-    selfPort < 0 ||
-    selfPort > 65_535
-  ) {
-    return null;
-  }
-
+): WSFHRegisterPeerMessage["payload"] | null {
   return {
-    type: "file-harbour-register-peer",
-    payload: {
-      selfTag: data.selfTag,
-      distantTag: data.distantTag,
-      selfAddr: data.selfAddr ?? "",
-      selfPort,
-      relayAddr: data.relayAddr,
-      relayPort,
-    },
+    selfTag: data.selfTag!,
+    distantTag: data.distantTag!,
+    selfPort: Number(data.selfPort) || undefined,
+    selfAddr: data.selfAddr || undefined,
+    relayAddr: data.relayAddr!,
+    relayPort: Number(data.relayPort)!,
   };
 }
 
 export const FileHarbourAddPeer: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const wsClient = useContext(wsClientContext).current;
+  const { registerPeer } = useFileHarbour();
 
   useEffect(() => {
     const addPeerAction = fileHarbourHeaderActions[0];
@@ -105,10 +85,11 @@ export const FileHarbourAddPeer: React.FC = () => {
     >
       <Form
         schema={formSchema}
+        data={{ relayPort: "56443", relayAddr: "127.0.0.1" } as any}
         onConfirm={(data) => {
-          const message = toRegisterPeerMessage(data);
-          if (message && wsClient) {
-            wsClient.sendMessage(message);
+          const payload = toRegisterPeerPayload(data);
+          if (payload) {
+            registerPeer(payload);
             setModalOpen(false);
           }
         }}

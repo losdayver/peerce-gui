@@ -55,6 +55,33 @@
   outline: none;
 }
 
+.intrinsic-file-input {
+  width: 100%;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: rgba(248, 251, 255, 0.9);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+}
+
+.intrinsic-file-input:hover,
+.intrinsic-file-input:focus-visible {
+  border-color: rgba(255, 255, 255, 0.16);
+  background-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.intrinsic-file-input:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
+}
+
 .intrinsic-checkbox {
   width: 18px;
   height: 18px;

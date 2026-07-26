@@ -6,12 +6,12 @@
   "scripts": {
     "compile": "npm run compile:frontend && npm run compile:backend",
     "compile:frontend": "vite build && node scripts/copy-frontend.mjs",
-    "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
     "compile:backend": "npx tsc -p backend/tsconfig.json",
-    "dev:host": "npm run compile && node dist/backend/server.js",
-    "watch:host": "nodemon --watch backend npm run compile:backend && node dist/backend/server.js",
+    "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
+    "watch:backend": "nodemon --watch backend --watch commonTypes --ext ts,js,json --exec \"npm run compile:backend && node dist/backend/server.js\"",
     "dev": "tauri dev",
-    "build": "tauri build"
+    "build": "tauri build",
+    "peerce-relay-local": "npx peerce-relay --selfAddr 0.0.0.0 --selfPort 56443"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0",
@@ -25,7 +25,8 @@
     "vite": "^8.1.5"
   },
   "dependencies": {
-    "peerce": "file:peerce-1.0.5.tgz",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
+    "peerce": "file:peerce-1.0.6.tgz",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "ws": "^8.21.1"

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { ItemDescriptor } from "./form";
 import { Input } from "../intrinsic/input";
 import { Checkbox } from "../intrinsic/checkbox";
+import { FileInput } from "../intrinsic/fileInput";
 
 export interface FormItemProps {
   title: string;
@@ -35,13 +36,15 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
 
 export const componentFactory = (
   descriptor: ItemDescriptor,
-  onChange: (val: any) => void
+  value: any,
+  onChange: (val: any) => void,
 ) => {
   switch (descriptor.component) {
     case "input":
       return (
         <Input
           {...descriptor}
+          value={value}
           onChange={(event) => onChange(event.target.value)}
         />
       );
@@ -49,8 +52,13 @@ export const componentFactory = (
       return (
         <Checkbox
           {...descriptor}
+          value={value}
           onChange={(event) => onChange(event.target.checked)}
         />
+      );
+    case "file":
+      return (
+        <FileInput {...descriptor} value={value} onPathChange={onChange} />
       );
     default:
       return <></>;

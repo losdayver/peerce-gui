@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "local.peerce-gui-tauri-nodejs",
   "build": {
-    "beforeDevCommand": "npm run dev:host",
+    "beforeDevCommand": "npm run watch:backend",
     "beforeBuildCommand": "npm run compile",
     "devUrl": "http://127.0.0.1:4310",
     "frontendDist": "../dist/frontend"

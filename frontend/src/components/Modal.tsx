@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Button } from "./intrinsic/button";
 
 export interface ModalProps {
-  onClose: () => void;
+  onClose?: () => void;
   open?: boolean;
   title?: string;
 }
@@ -30,10 +30,7 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
         <div className="modal__dialog" role="dialog" aria-modal="true">
           <div className="modal__header">
             <span>{title ?? ""}</span>
-            <Button
-              aria-label="Close dialog"
-              onClick={onClose}
-            >
+            <Button aria-label="Close dialog" onClick={onClose}>
               X
             </Button>
           </div>

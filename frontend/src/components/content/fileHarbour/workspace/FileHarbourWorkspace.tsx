@@ -1,8 +1,6 @@
 import { Empty } from "../../../misc";
 import { Button } from "../../../intrinsic/button";
 import { useFileHarbour } from "../fileHarbourContext";
-import { useContext } from "react";
-import { wsClientContext } from "../../../../interop/wsClient";
 
 function getInitials(tag: string): string {
   return tag
@@ -15,9 +13,7 @@ function getInitials(tag: string): string {
 }
 
 export const FileHarbourWorkspace: React.FC = () => {
-  const { state, activePeerTag } = useFileHarbour();
-  const wsClientRef = useContext(wsClientContext);
-  const wsClient = wsClientRef.current!;
+  const { state, activePeerTag, unregisterPeer, addTransfer } = useFileHarbour();
   const activePeer = state.items.find((peer) => peer.tag === activePeerTag);
 
   if (!activePeer) {
@@ -46,22 +42,12 @@ export const FileHarbourWorkspace: React.FC = () => {
 
       <div className="file-harbour__workspace-actions">
         <Button
-          onClick={() => {
-            wsClient.sendMessage({
-              type: "file-harbour-unregister-peer",
-              payload: { tag: activePeer.tag },
-            });
-          }}
+          onClick={() => unregisterPeer(activePeer.tag)}
         >
           🔌 Disconnect
         </Button>
         <Button
-          onClick={() => {
-            wsClient.sendMessage({
-              type: "file-harbour-add-transfer",
-              payload: { tag: activePeer.tag },
-            });
-          }}
+          onClick={() => addTransfer(activePeer.tag)}
         >
           ➕ Add transfer
         </Button>

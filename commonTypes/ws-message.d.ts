@@ -28,8 +28,8 @@ export interface WSFHRegisterPeerMessage {
     relayPort: number;
     selfTag: string;
     distantTag: string;
-    selfAddr: string;
-    selfPort: number;
+    selfAddr?: string;
+    selfPort?: number;
   };
 }
 

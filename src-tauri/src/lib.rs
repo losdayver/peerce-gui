@@ -16,8 +16,8 @@ pub fn run() {
     let backend: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
     let backend_on_setup = Arc::clone(&backend);
 
-    
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .setup(move |app| {
             #[cfg(not(debug_assertions))]
             {
