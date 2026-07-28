@@ -27,11 +27,9 @@
     "active": true,
     "icon": ["icons/icon.ico"],
     "resources": {
-      "../dist/backend": "backend",
-      "../node_modules/peerce": "node_modules/peerce",
-      "../node_modules/state-shifter": "node_modules/state-shifter",
-      "../node_modules/ws": "node_modules/ws",
-      "../node_modules/zod": "node_modules/zod"
+      "../dist/backend/server.js": "backend/server.js",
+      "../dist/backend/server.js.map": "backend/server.js.map",
+      "../backend/package.json": "backend/package.json"
     }
   }
 }
