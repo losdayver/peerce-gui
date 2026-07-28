@@ -6,7 +6,8 @@ import { GlobalAppConfig } from "@commonTypes/app.js";
 
 const globalAppConfigBase: GlobalAppConfig = {};
 
-const homeConfigDir = join(homedir(), ".peerce-gui");
+export const homeDirFolderName = ".peerce-gui";
+const homeConfigDir = join(homedir(), homeDirFolderName);
 const configFileBaseName = "config.json";
 const configFullPath = join(homeConfigDir, configFileBaseName);
 
@@ -15,6 +16,7 @@ const exists = existsSync(configFullPath);
 if (!exists)
   writeFileSync(configFullPath, JSON.stringify(globalAppConfigBase, null, 2));
 
-export const getConfig = () => readFile(configFullPath);
+export const getConfig = async () =>
+  JSON.parse((await readFile(configFullPath)).toString()) as GlobalAppConfig;
 export const saveConfig = (data: GlobalAppConfig) =>
   writeFile(configFullPath, JSON.stringify(data, null, 2));

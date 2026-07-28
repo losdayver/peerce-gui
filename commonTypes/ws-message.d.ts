@@ -13,12 +13,18 @@ export type WSMessages =
   | WSFHRequestStateMessage
   | WSFHAddTransferMessage
   | WSFileHarbourState
-  | WSAppSaveConfigMessage;
+  | WSAppSaveConfigMessage
+  | WSAppGetConfigMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
   type: "test";
   payload: "ping" | "pong";
+}
+
+export interface WSAppGetConfigMessage {
+  type: "app-get-config";
+  payload?: GlobalAppConfig;
 }
 //#endregion
 

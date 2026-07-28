@@ -18,9 +18,11 @@ import { fileHarbourHeaderActions } from "@content/fileHarbour/fileHarbourAddPee
 import { WsClient, wsClientContext } from "@interop/wsClient";
 import { Empty } from "@utils";
 import { GlobalAppConfig } from "@commonTypes/app";
+import { WSMessages } from "@commonTypes/ws-message";
 
 export interface AppContextValue {
   saveConfig: (config: GlobalAppConfig) => void;
+  getConfig: () => Promise<GlobalAppConfig>;
 }
 
 export const AppContext = createContext<AppContextValue>(null as any);
@@ -30,13 +32,27 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const wsClient = useContext(wsClientContext).current;
 
-  useEffect(() => {
-    if (!wsClient) return;
-  });
-
   const contextValue: AppContextValue = {
     saveConfig: (data) =>
       wsClient?.sendMessage({ type: "app-save-config", payload: data }),
+    getConfig: async () => {
+      if (!wsClient) return {};
+      let resolver: (value: unknown) => void;
+      const promise = new Promise((res) => (resolver = res));
+      let config: GlobalAppConfig;
+      const callback = (event: Event) => {
+        const message = (event as CustomEvent<WSMessages>).detail;
+        if (message.type == "app-get-config") {
+          config = message.payload!;
+          resolver(true);
+        }
+      };
+      wsClient.eventEmitter.addEventListener("message", callback);
+      wsClient?.sendMessage({ type: "app-get-config" });
+      await promise;
+      wsClient.eventEmitter.removeEventListener("message", callback);
+      return config!;
+    },
   };
 
   return (

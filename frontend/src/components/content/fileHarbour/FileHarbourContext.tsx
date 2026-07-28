@@ -11,6 +11,7 @@ import type {
   WSGenericMessage,
   WSFHAddTransferMessage,
   WSFHRegisterPeerMessage,
+  WSMessages,
 } from "@commonTypes/ws-message.js";
 import { wsClientContext } from "@interop/wsClient";
 import { Modal } from "@modal/modal";
@@ -27,7 +28,7 @@ export interface FileHarbourContextValue {
   registerPeer: (payload: WSFHRegisterPeerMessage["payload"]) => void;
   unregisterPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
-  
+
 }
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);
@@ -48,7 +49,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     if (!wsClient) return;
 
     const onMessage = (event: Event): void => {
-      const message = (event as CustomEvent<WSGenericMessage>).detail;
+      const message = (event as CustomEvent<WSMessages>).detail;
       if (!isFileHarbourState(message)) return;
 
       setState(message.payload);

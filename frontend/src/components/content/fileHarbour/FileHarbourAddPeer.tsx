@@ -3,11 +3,9 @@ import type { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
 import type { ContentWindowHeaderAction } from "@main/sideBar";
 import { Modal } from "@modal/modal";
 import { useFileHarbour } from "./fileHarbourContext";
-import {
-  Form,
-  type FormSchema,
-  type InferDataFromSchema,
-} from "@form/form";
+import { Form, type FormSchema, type InferDataFromSchema } from "@form/form";
+import { useApp } from "@components/main/app";
+import { GlobalAppConfig } from "@commonTypes/app";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "Add new peer", fn: null },
@@ -67,10 +65,15 @@ function toRegisterPeerPayload(
 export const FileHarbourAddPeer: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const { registerPeer } = useFileHarbour();
+  const { getConfig } = useApp();
+  const [config, setConfig] = useState<GlobalAppConfig>({});
 
   useEffect(() => {
     const addPeerAction = fileHarbourHeaderActions[0];
-    addPeerAction.fn = () => setModalOpen(true);
+    addPeerAction.fn = async () => {
+      setConfig(await getConfig());
+      setModalOpen(true);
+    };
 
     return () => {
       addPeerAction.fn = null;
@@ -85,7 +88,7 @@ export const FileHarbourAddPeer: React.FC = () => {
     >
       <Form
         schema={formSchema}
-        data={{ relayPort: "56443", relayAddr: "127.0.0.1" } as any}
+        data={config as any}
         onConfirm={(data) => {
           const payload = toRegisterPeerPayload(data);
           if (payload) {

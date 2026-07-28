@@ -2,10 +2,13 @@ import type {
   FileHarborState,
   FileHarborStateItem,
 } from "@commonTypes/file-harbour.js";
-import path, { basename } from "node:path";
+import { basename, join } from "node:path";
 import { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
 import { SimplePeer } from "peerce";
-import { readFileSync, writeFileSync, mkdir } from "node:fs";
+import { writeFile, readFile } from "fs/promises";
+import { homedir } from "os";
+import { homeDirFolderName } from "./configProvider.js";
+import { mkdir } from "node:fs/promises";
 
 const demoPeerTag = "demo-peer";
 
@@ -62,9 +65,11 @@ export class FileHarbor {
 class LivePeerConnection implements PeerConnection {
   peer: SimplePeer;
   transfers = new Map<string, { fileName: string; progress: number }>();
+  private distantTag: string;
 
   constructor(payload: WSFHRegisterPeerMessage["payload"]) {
     this.peer = new SimplePeer(payload);
+    this.distantTag = payload.distantTag;
     this.peer.on("onFullMessage", this.onFullMessage);
     this.peer.on(
       "onIncomingTransmissionStart",
@@ -90,8 +95,16 @@ class LivePeerConnection implements PeerConnection {
     transfer.progress = progress;
   };
 
-  onFullMessage = ({ buffer, fileName }) => {
-    writeFileSync(path.join("./out", basename(fileName)), buffer);
+  onFullMessage = async ({ buffer, fileName }) => {
+    const distantPeerDir = join(
+      homedir(),
+      homeDirFolderName,
+      "file-harbour",
+      "transmissions",
+      this.distantTag
+    );
+    await mkdir(distantPeerDir, { recursive: true });
+    await writeFile(join(distantPeerDir, basename(fileName)), buffer);
   };
 
   getState = (): FileHarborStateItem["state"] => {
@@ -116,10 +129,10 @@ class LivePeerConnection implements PeerConnection {
     this.peer.close();
   };
 
-  addTransfer = (fullFilePath: string) => {
+  addTransfer = async (fullFilePath: string) => {
     this.peer.sendData({
       fileName: basename(fullFilePath),
-      payload: readFileSync(fullFilePath),
+      payload: await readFile(fullFilePath),
     });
   };
 

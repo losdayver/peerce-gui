@@ -1,7 +1,7 @@
 import { WebSocketServer } from "ws";
 import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
 import { FileHarbor } from "./fileHarbour.js";
-import { saveConfig } from "./configProvider.js";
+import { getConfig, saveConfig } from "./configProvider.js";
 
 type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
   webSocket: WebSocket,
@@ -63,6 +63,9 @@ export class WssRouter {
       this.sendMessage({ type: "file-harbour-state", payload: state });
     },
     "app-save-config": (_, data) => saveConfig(data.payload),
+    "app-get-config": async (_, data) => {
+      this.sendMessage({ type: "app-get-config", payload: await getConfig() });
+    },
   };
 
   constructor(private wss: WebSocketServer) {

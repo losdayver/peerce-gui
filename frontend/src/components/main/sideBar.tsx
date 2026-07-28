@@ -80,13 +80,15 @@ const SideBarItem: React.FC<SideBarItemProps> = ({
 export interface SideBarFooterProps {}
 
 export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
-  const { saveConfig } = useApp();
+  const { saveConfig, getConfig } = useApp();
+  const [config, setConfig] = useState<GlobalAppConfig>({});
 
   const [configModalOpen, setConfigModalOpen] = useState(false);
   return (
     <div className="sidebar-footer">
       <Modal open={configModalOpen} onClose={() => setConfigModalOpen(false)}>
         <Form<FormSchema<GlobalAppConfig>>
+          data={config as any}
           schema={{
             relayAddr: {
               component: "input",
@@ -96,6 +98,10 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
               component: "input",
               title: "Default relay port",
             },
+            selfTag: {
+              component: "input",
+              title: "Self tag",
+            },
           }}
           onConfirm={(data) => {
             saveConfig(data as any);
@@ -103,7 +109,15 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
           }}
         />
       </Modal>
-      <Button onClick={() => setConfigModalOpen(true)}>⚙️</Button>
+      <Button
+        onClick={async () => {
+          const config = await getConfig();
+          setConfig(config);
+          setConfigModalOpen(true);
+        }}
+      >
+        ⚙️
+      </Button>
     </div>
   );
 };
