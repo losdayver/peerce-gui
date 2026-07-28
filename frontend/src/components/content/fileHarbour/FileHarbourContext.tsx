@@ -1,3 +1,5 @@
+import { open } from "@tauri-apps/plugin-dialog";
+import { homeDir, join } from "@tauri-apps/api/path";
 import {
   createContext,
   useContext,
@@ -28,7 +30,7 @@ export interface FileHarbourContextValue {
   registerPeer: (payload: WSFHRegisterPeerMessage["payload"]) => void;
   unregisterPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
-
+  openPeerFileDir: (tag: string) => Promise<void>;
 }
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);
@@ -87,6 +89,17 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     setTransferModalOpen(false);
   };
 
+  const openPeerFileDir = async (tag: string) => {
+    const transmissionsDir = await join(
+      await homeDir(),
+      ".peerce-gui",
+      "file-harbour",
+      "transmissions",
+      tag
+    );
+    open({ defaultPath: transmissionsDir });
+  };
+
   return (
     <FileHarbourContext.Provider
       value={{
@@ -96,6 +109,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         registerPeer,
         unregisterPeer,
         addTransfer,
+        openPeerFileDir,
       }}
     >
       <Modal

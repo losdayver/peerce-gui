@@ -14,7 +14,10 @@ const demoPeerTag = "demo-peer";
 
 interface PeerConnection {
   getState: () => FileHarborStateItem["state"];
-  getTransfers: () => FileHarborStateItem["transfers"];
+  getTransfers: () => Pick<
+    FileHarborStateItem,
+    "incomingTransfers" | "outgoingTransfers"
+  >;
   unregister: () => void;
   addTransfer: (fullFilePath: string) => void;
 }
@@ -55,7 +58,7 @@ export class FileHarbor {
       ([tag, peerConn]) => ({
         tag,
         state: peerConn.getState(),
-        transfers: peerConn.getTransfers(),
+        ...peerConn.getTransfers(),
       })
     );
     return { items };
@@ -64,7 +67,11 @@ export class FileHarbor {
 
 class LivePeerConnection implements PeerConnection {
   peer: SimplePeer;
-  transfers = new Map<string, { fileName: string; progress: number }>();
+  private incomingTransfers = new Map<
+    string,
+    { fileName: string; progress: number }
+  >();
+  private outgoingTransfers: FileHarborStateItem["outgoingTransfers"] = [];
   private distantTag: string;
 
   constructor(payload: WSFHRegisterPeerMessage["payload"]) {
@@ -83,14 +90,14 @@ class LivePeerConnection implements PeerConnection {
   }
 
   onIncomingTransmissionStart = (fileName: string) => {
-    this.transfers.set(fileName, { fileName, progress: 0 });
+    this.incomingTransfers.set(fileName, { fileName, progress: 0 });
   };
 
   onIncomingTransmissionPercentageChange = (
     fileName: string,
     progress: number
   ) => {
-    const transfer = this.transfers.get(fileName);
+    const transfer = this.incomingTransfers.get(fileName);
     if (!transfer) return;
     transfer.progress = progress;
   };
@@ -130,25 +137,36 @@ class LivePeerConnection implements PeerConnection {
   };
 
   addTransfer = async (fullFilePath: string) => {
+    const fileName = basename(fullFilePath);
+    const payload = await readFile(fullFilePath);
     this.peer.sendData({
-      fileName: basename(fullFilePath),
-      payload: await readFile(fullFilePath),
+      fileName,
+      payload,
     });
+    this.outgoingTransfers = [
+      ...this.outgoingTransfers,
+      { fileName, progress: 1 },
+    ];
   };
 
-  getTransfers = (): FileHarborStateItem["transfers"] => [
-    ...this.transfers.values(),
-  ];
+  getTransfers = () => ({
+    incomingTransfers: [...this.incomingTransfers.values()],
+    outgoingTransfers: this.outgoingTransfers,
+  });
 }
 
 class DemoPeerConnection implements PeerConnection {
   private state: FileHarborStateItem["state"] = "connected";
   private transferCount = 0;
-  private transfers: FileHarborStateItem["transfers"] = [];
+  private incomingTransfers: FileHarborStateItem["incomingTransfers"] = [];
+  private outgoingTransfers: FileHarborStateItem["outgoingTransfers"] = [];
 
   getState = (): FileHarborStateItem["state"] => this.state;
 
-  getTransfers = (): FileHarborStateItem["transfers"] => this.transfers;
+  getTransfers = () => ({
+    incomingTransfers: this.incomingTransfers,
+    outgoingTransfers: this.outgoingTransfers,
+  });
 
   unregister = (): void => {
     this.state = "offline";
@@ -156,8 +174,8 @@ class DemoPeerConnection implements PeerConnection {
 
   addTransfer = (fullFilePath: string): void => {
     this.transferCount += 1;
-    this.transfers = [
-      ...this.transfers,
+    this.outgoingTransfers = [
+      ...this.outgoingTransfers,
       {
         fileName:
           basename(fullFilePath) || `demo-file-${this.transferCount}.txt`,

@@ -193,7 +193,7 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
-  padding: 32px;
+  padding: 24px;
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -201,8 +201,8 @@
 .file-harbour__workspace-peer {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding-bottom: 28px;
+  gap: 12px;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
@@ -215,21 +215,21 @@
 }
 
 .file-harbour__workspace-avatar {
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   display: grid;
   flex: 0 0 auto;
   place-items: center;
   border: 1px solid rgba(118, 228, 180, 0.42);
   border-radius: 50%;
   color: #f8fbff;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 800;
   background: rgba(118, 228, 180, 0.1);
 }
 
 .file-harbour__workspace-status {
-  margin: 7px 0 0;
+  margin: 4px 0 0;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -255,35 +255,49 @@
 }
 
 .file-harbour__workspace-actions {
-  padding: 24px 0;
+  padding: 14px 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .file-harbour__transfers {
-  padding-top: 26px;
+  padding-top: 16px;
+}
+
+.file-harbour__transfers-section + .file-harbour__transfers-section {
+  margin-top: 16px;
 }
 
 .file-harbour__transfers-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 
 .file-harbour__transfers-header h3 {
-  font-size: 14px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.file-harbour__transfers-header span,
+.file-harbour__transfers-header span {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: rgba(232, 238, 247, 0.7);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.07);
+}
+
 .file-harbour__transfers-empty {
   margin: 0;
   color: rgba(232, 238, 247, 0.5);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .file-harbour__transfers-list {
@@ -291,10 +305,10 @@
 }
 
 .file-harbour__transfer {
-  min-height: 58px;
+  min-height: 46px;
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.2fr) 46px;
-  gap: 16px;
+  grid-template-columns: minmax(110px, 1fr) minmax(90px, 1.2fr) 40px;
+  gap: 12px;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
@@ -309,7 +323,7 @@
 }
 
 .file-harbour__transfer-progress {
-  height: 8px;
+  height: 6px;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.09);
@@ -329,7 +343,7 @@
 
 @media (max-width: 760px) {
   .file-harbour__workspace {
-    padding: 22px;
+    padding: 18px;
   }
 
   .file-harbour__transfer {

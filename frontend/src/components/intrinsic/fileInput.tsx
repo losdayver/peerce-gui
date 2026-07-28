@@ -1,11 +1,10 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { useState, type ComponentPropsWithoutRef } from "react";
 
-export interface FileInputProps
-  extends Omit<
-    ComponentPropsWithoutRef<"button">,
-    "children" | "onClick" | "type"
-  > {
+export interface FileInputProps extends Omit<
+  ComponentPropsWithoutRef<"button">,
+  "children" | "onClick" | "type"
+> {
   accept?: string;
   onPathChange: (path: string) => void;
 }
@@ -51,7 +50,7 @@ export const FileInput: React.FC<FileInputProps> = ({
       title={selectedPath ?? undefined}
       type="button"
     >
-      {selectedPath ?? "Choose file"}
+      {selectedPath?.slice(0, 50) ?? "Choose file"}
     </button>
   );
 };

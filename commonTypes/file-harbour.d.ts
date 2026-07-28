@@ -1,7 +1,8 @@
 export interface FileHarborStateItem {
   tag: string;
   state: "offline" | "connected" | "connecting";
-  transfers: FileHarborStateItemTransfer[];
+  incomingTransfers: FileHarborStateItemTransfer[];
+  outgoingTransfers: FileHarborStateItemTransfer[];
 }
 
 export interface FileHarborStateItemTransfer {

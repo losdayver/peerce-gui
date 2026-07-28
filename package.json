@@ -10,9 +10,9 @@
     "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
     "watch:backend": "nodemon --watch backend --watch commonTypes --ext ts,js,json --exec \"npm run compile:backend && node dist/backend/server.js\"",
     "watch:dev": "node scripts/watch-dev.mjs",
+    "peerce-relay-local": "npx peerce-relay --selfAddr 0.0.0.0 --selfPort 56443",
     "dev": "tauri dev",
-    "build": "tauri build",
-    "peerce-relay-local": "npx peerce-relay --selfAddr 0.0.0.0 --selfPort 56443"
+    "build": "tauri build"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0",

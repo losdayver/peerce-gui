@@ -3,7 +3,6 @@ import { Button } from "@components/intrinsic/button";
 import { Modal } from "@components/modal/modal";
 import { createContext, useContext, useState } from "react";
 import { GlobalAppConfig } from "@commonTypes/app";
-import { useFileHarbour } from "@components/content/fileHarbour/fileHarbourContext";
 import { useApp } from "./app";
 
 export interface SideBarProps {
