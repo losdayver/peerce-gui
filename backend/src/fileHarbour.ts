@@ -61,12 +61,34 @@ export class FileHarbor {
 
 class LivePeerConnection implements PeerConnection {
   peer: SimplePeer;
+  transfers = new Map<string, { fileName: string; progress: number }>();
 
   constructor(payload: WSFHRegisterPeerMessage["payload"]) {
     this.peer = new SimplePeer(payload);
-    this.peer.eventEmitter.on("onFullMessage", this.onFullMessage);
-    void this.peer.requestSessionViaRelay();
+    this.peer.on("onFullMessage", this.onFullMessage);
+    this.peer.on(
+      "onIncomingTransmissionStart",
+      this.onIncomingTransmissionStart
+    );
+    this.peer.on(
+      "onIncomingTransmissionPercentageChange",
+      this.onIncomingTransmissionPercentageChange
+    );
+    void this.peer.requestSessionViaRelayAsync();
   }
+
+  onIncomingTransmissionStart = (fileName: string) => {
+    this.transfers.set(fileName, { fileName, progress: 0 });
+  };
+
+  onIncomingTransmissionPercentageChange = (
+    fileName: string,
+    progress: number
+  ) => {
+    const transfer = this.transfers.get(fileName);
+    if (!transfer) return;
+    transfer.progress = progress;
+  };
 
   onFullMessage = ({ buffer, fileName }) => {
     writeFileSync(path.join("./out", basename(fileName)), buffer);
@@ -101,7 +123,9 @@ class LivePeerConnection implements PeerConnection {
     });
   };
 
-  getTransfers = (): FileHarborStateItem["transfers"] => [];
+  getTransfers = (): FileHarborStateItem["transfers"] => [
+    ...this.transfers.values(),
+  ];
 }
 
 class DemoPeerConnection implements PeerConnection {

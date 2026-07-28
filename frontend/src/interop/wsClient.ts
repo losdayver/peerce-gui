@@ -1,4 +1,4 @@
-import type { WSGenericMessage } from "@commonTypes/ws-message.js";
+import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
 import { createContext, RefObject } from "react";
 
 export const wsClientContext = createContext<RefObject<WsClient | null>>({
@@ -30,7 +30,7 @@ export class WsClient {
     }
   };
 
-  sendMessage = (message: WSGenericMessage): void => {
+  sendMessage = (message: WSMessages): void => {
     this.ws.send(JSON.stringify(message));
   };
 }

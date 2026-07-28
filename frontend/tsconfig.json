@@ -20,6 +20,15 @@
     "jsx": "react-jsx",
 
     "paths": {
+      "@components/*": ["./src/components/*"],
+      "@content/*": ["./src/components/content/*"],
+      "@form/*": ["./src/components/form/*"],
+      "@intrinsic/*": ["./src/components/intrinsic/*"],
+      "@interop/*": ["./src/interop/*"],
+      "@main/*": ["./src/components/main/*"],
+      "@modal/*": ["./src/components/modal/*"],
+      "@utils": ["./src/components/utils.tsx"],
+      "@utils/*": ["./src/components/utils/*"],
       "@commonTypes/*": ["../commonTypes/*"]
     }
   },

@@ -1,3 +1,4 @@
+import { GlobalAppConfig } from "./app.js";
 import { FileHarborState } from "./file-harbour.js";
 
 export interface WSGenericMessage {
@@ -11,7 +12,8 @@ export type WSMessages =
   | WSFHUnregisterPeerMessage
   | WSFHRequestStateMessage
   | WSFHAddTransferMessage
-  | WSFileHarbourState;
+  | WSFileHarbourState
+  | WSAppSaveConfigMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -50,6 +52,11 @@ export interface WSFHAddTransferMessage {
 
 export interface WSFHRequestStateMessage {
   type: "file-harbour-request-state";
+}
+
+export interface WSAppSaveConfigMessage {
+  type: "app-save-config";
+  payload: GlobalAppConfig;
 }
 //#endregion
 

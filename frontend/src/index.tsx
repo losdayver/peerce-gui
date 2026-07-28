@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { App } from "./components/app";
+import { App } from "@main/app";
 
 const rootDiv = document.querySelector<HTMLDivElement>("#root");
 const root = createRoot(rootDiv!);

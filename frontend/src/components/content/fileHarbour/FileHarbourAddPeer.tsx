@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
-import type { ContentWindowHeaderAction } from "../../sideBar";
-import { Modal } from "../../modal";
+import type { ContentWindowHeaderAction } from "@main/sideBar";
+import { Modal } from "@modal/modal";
 import { useFileHarbour } from "./fileHarbourContext";
 import {
   Form,
   type FormSchema,
   type InferDataFromSchema,
-} from "../../form/form";
+} from "@form/form";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "Add new peer", fn: null },

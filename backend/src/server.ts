@@ -8,6 +8,8 @@ import { createServer, type ServerResponse } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { WssRouter } from "./wssRouter.js";
+import * as config from "./configProvider.js";
+config;
 
 const logStream = createWriteStream("backend.log", { flags: "a" });
 process.stdout.write = logStream.write.bind(logStream);

@@ -1,8 +1,15 @@
-import { createContext, useContext } from "react";
+import { Form, FormSchema } from "@components/form/form";
+import { Button } from "@components/intrinsic/button";
+import { Modal } from "@components/modal/modal";
+import { createContext, useContext, useState } from "react";
+import { GlobalAppConfig } from "@commonTypes/app";
+import { useFileHarbour } from "@components/content/fileHarbour/fileHarbourContext";
+import { useApp } from "./app";
 
 export interface SideBarProps {
   header?: React.ReactNode;
   items?: SideBarItemProps[];
+  style?: React.CSSProperties;
 }
 
 /** fn implementations are assigned later in designated content window content components
@@ -19,7 +26,7 @@ export interface SideBarItemProps {
   active?: boolean;
   icon?: React.ReactNode;
   onClick?: () => void;
-  content?: React.FC<unknown>;
+  content?: React.FC;
   headerActions?: ContentWindowHeaderAction[];
 }
 
@@ -31,12 +38,12 @@ export interface SidebarContextType {
 
 export const sidebarContext = createContext<SidebarContextType | null>(null);
 
-export const SideBar: React.FC<SideBarProps> = ({ header, items }) => {
+export const SideBar: React.FC<SideBarProps> = ({ header, items, style }) => {
   const sideBarCtx = useContext(sidebarContext);
   const activeItem = sideBarCtx?.getActiveItemKey();
 
   return (
-    <div className="sidebar">
+    <div className="sidebar" {...(style as any)}>
       {header && <div className="sidebar__header">{header}</div>}
       {items?.length && (
         <div className="sidebar__content">
@@ -66,6 +73,37 @@ const SideBarItem: React.FC<SideBarItemProps> = ({
       className={`sidebar__content__item ${active ? "sidebar__content__item--active" : ""}`}
     >
       {title}
+    </div>
+  );
+};
+
+export interface SideBarFooterProps {}
+
+export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
+  const { saveConfig } = useApp();
+
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  return (
+    <div className="sidebar-footer">
+      <Modal open={configModalOpen} onClose={() => setConfigModalOpen(false)}>
+        <Form<FormSchema<GlobalAppConfig>>
+          schema={{
+            relayAddr: {
+              component: "input",
+              title: "Default relay address",
+            },
+            relayPort: {
+              component: "input",
+              title: "Default relay port",
+            },
+          }}
+          onConfirm={(data) => {
+            saveConfig(data as any);
+            setConfigModalOpen(false);
+          }}
+        />
+      </Modal>
+      <Button onClick={() => setConfigModalOpen(true)}>⚙️</Button>
     </div>
   );
 };

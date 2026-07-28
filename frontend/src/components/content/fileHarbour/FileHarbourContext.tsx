@@ -12,9 +12,9 @@ import type {
   WSFHAddTransferMessage,
   WSFHRegisterPeerMessage,
 } from "@commonTypes/ws-message.js";
-import { wsClientContext } from "../../../interop/wsClient";
-import { Modal } from "../../modal";
-import { Form, type FormSchema } from "../../form/form";
+import { wsClientContext } from "@interop/wsClient";
+import { Modal } from "@modal/modal";
+import { Form, type FormSchema } from "@form/form";
 
 const transferFormSchema = {
   fullFilePath: { component: "file", title: "File", required: true },
@@ -27,6 +27,7 @@ export interface FileHarbourContextValue {
   registerPeer: (payload: WSFHRegisterPeerMessage["payload"]) => void;
   unregisterPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
+  
 }
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);

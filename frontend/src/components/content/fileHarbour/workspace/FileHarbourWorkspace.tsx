@@ -1,5 +1,5 @@
-import { Empty } from "../../../misc";
-import { Button } from "../../../intrinsic/button";
+import { Empty } from "@utils";
+import { Button } from "@intrinsic/button";
 import { useFileHarbour } from "../fileHarbourContext";
 
 function getInitials(tag: string): string {
@@ -13,7 +13,8 @@ function getInitials(tag: string): string {
 }
 
 export const FileHarbourWorkspace: React.FC = () => {
-  const { state, activePeerTag, unregisterPeer, addTransfer } = useFileHarbour();
+  const { state, activePeerTag, unregisterPeer, addTransfer } =
+    useFileHarbour();
   const activePeer = state.items.find((peer) => peer.tag === activePeerTag);
 
   if (!activePeer) {
@@ -41,14 +42,10 @@ export const FileHarbourWorkspace: React.FC = () => {
       </header>
 
       <div className="file-harbour__workspace-actions">
-        <Button
-          onClick={() => unregisterPeer(activePeer.tag)}
-        >
+        <Button onClick={() => unregisterPeer(activePeer.tag)}>
           🔌 Disconnect
         </Button>
-        <Button
-          onClick={() => addTransfer(activePeer.tag)}
-        >
+        <Button onClick={() => addTransfer(activePeer.tag)}>
           ➕ Add transfer
         </Button>
       </div>

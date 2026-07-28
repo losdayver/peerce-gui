@@ -11,6 +11,7 @@
   );
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 16px 0 36px rgba(0, 0, 0, 0.18);
+  height: 100%;
 }
 
 .sidebar__header {
@@ -62,4 +63,15 @@
 
 .sidebar__content__item:active {
   transform: translateX(2px) scale(0.99);
+}
+
+.sidebar-footer {
+  padding: 18px 14px;
+  height: 40px;
+  background: linear-gradient(
+    180deg,
+    rgba(42, 47, 60, 0.96),
+    rgba(27, 30, 39, 0.98)
+  );
+  display: "flex";
 }

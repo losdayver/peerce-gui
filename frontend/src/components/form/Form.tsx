@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { componentFactory, FormItem } from "./formItem";
-import { InputProps } from "../intrinsic/input";
-import { CheckboxProps } from "../intrinsic/checkbox";
-import { FileInputProps } from "../intrinsic/fileInput";
-import { Button } from "../intrinsic/button";
+import { InputProps } from "@intrinsic/input";
+import { CheckboxProps } from "@intrinsic/checkbox";
+import { FileInputProps } from "@intrinsic/fileInput";
+import { Button } from "@intrinsic/button";
 
 export type ItemDescriptor = (
   | InputItemDescriptor
@@ -34,9 +34,8 @@ interface ComponentToTypeMap {
   file: string;
 }
 
-export type FormSchema = {
-  [Key in string]: ItemDescriptor;
-};
+export type FormSchema<KeysType extends object = Record<string, unknown>> =
+  Record<keyof KeysType, ItemDescriptor>;
 
 export type InferDataFromSchema<Schema extends FormSchema> = {
   [Key in keyof Schema]: ComponentToTypeMap[Schema[Key]["component"]];
@@ -46,12 +45,14 @@ export interface FormProps<Schema extends FormSchema> {
   schema: Schema;
   data?: InferDataFromSchema<Schema>;
   onConfirm?: (data: Partial<InferDataFromSchema<Schema>>) => void;
+  customValidate?: (data: Partial<InferDataFromSchema<Schema>>) => boolean;
 }
 
 export const Form = <Schema extends FormSchema>({
   schema,
   data,
   onConfirm,
+  customValidate,
 }: FormProps<Schema>) => {
   const [formData, setFormData] = useState<
     Partial<InferDataFromSchema<Schema>>
@@ -83,7 +84,11 @@ export const Form = <Schema extends FormSchema>({
       ))}
       <Button
         className="form__submit"
-        onClick={() => validate() && onConfirm?.(formData)}
+        onClick={() =>
+          validate() &&
+          (customValidate ? customValidate(formData) : true) &&
+          onConfirm?.(formData)
+        }
       >
         Confirm
       </Button>

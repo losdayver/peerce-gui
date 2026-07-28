@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
 import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
 import { FileHarbor } from "./fileHarbour.js";
+import { saveConfig } from "./configProvider.js";
 
 type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
   webSocket: WebSocket,
@@ -61,6 +62,7 @@ export class WssRouter {
       const state = this.fileHarbour.getConstructedState();
       this.sendMessage({ type: "file-harbour-state", payload: state });
     },
+    "app-save-config": (_, data) => saveConfig(data.payload),
   };
 
   constructor(private wss: WebSocketServer) {

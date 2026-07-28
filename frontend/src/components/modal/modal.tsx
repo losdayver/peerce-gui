@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "./intrinsic/button";
+import { Button } from "@intrinsic/button";
 
 export interface ModalProps {
   onClose?: () => void;
