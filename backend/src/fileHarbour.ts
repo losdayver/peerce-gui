@@ -139,7 +139,7 @@ class LivePeerConnection implements PeerConnection {
   addTransfer = async (fullFilePath: string) => {
     const fileName = basename(fullFilePath);
     const payload = await readFile(fullFilePath);
-    this.peer.sendData({
+    this.peer.createOutgoingTransmission({
       fileName,
       payload,
     });
