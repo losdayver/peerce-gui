@@ -37,7 +37,7 @@ export class FileHarbor {
     // todo check if exists
 
     const connection = new LivePeerConnection(payload);
-    this.peerConnectionMap.set(payload.selfTag, connection);
+    this.peerConnectionMap.set(payload.distantTag, connection);
     this.sendUpdateMessage();
   };
   unregisterPeer = (tag: string): void => {
