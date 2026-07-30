@@ -24,8 +24,6 @@ interface PeerConnection {
 
 export class FileHarbor {
   constructor(private sendUpdateMessage: () => void) {
-    this.peerConnectionMap.set(demoPeerTag, new DemoPeerConnection());
-
     setInterval(() => {
       this.sendUpdateMessage();
     }, 500);
@@ -71,7 +69,10 @@ class LivePeerConnection implements PeerConnection {
     string,
     { fileName: string; progress: number }
   >();
-  private outgoingTransfers: FileHarborStateItem["outgoingTransfers"] = [];
+  private outgoingTransfers = new Map<
+    string,
+    { fileName: string; progress: number }
+  >();
   private distantTag: string;
 
   constructor(payload: WSFHRegisterPeerMessage["payload"]) {
@@ -86,6 +87,10 @@ class LivePeerConnection implements PeerConnection {
       "onIncomingTransmissionPercentageChange",
       this.onIncomingTransmissionPercentageChange
     );
+    this.peer.on(
+      "onOutgoingTransmissionPercentageChange",
+      this.onOutgoingTransmissionPercentageChange
+    );
     void this.peer.requestSessionViaRelayAsync();
   }
 
@@ -98,6 +103,15 @@ class LivePeerConnection implements PeerConnection {
     progress: number
   ) => {
     const transfer = this.incomingTransfers.get(fileName);
+    if (!transfer) return;
+    transfer.progress = progress;
+  };
+
+  onOutgoingTransmissionPercentageChange = (
+    fileName: string,
+    progress: number
+  ) => {
+    const transfer = this.outgoingTransfers.get(fileName);
     if (!transfer) return;
     transfer.progress = progress;
   };
@@ -143,44 +157,11 @@ class LivePeerConnection implements PeerConnection {
       fileName,
       payload,
     });
-    this.outgoingTransfers = [
-      ...this.outgoingTransfers,
-      { fileName, progress: 1 },
-    ];
+    this.outgoingTransfers.set(fileName, { fileName, progress: 0 });
   };
 
   getTransfers = () => ({
     incomingTransfers: [...this.incomingTransfers.values()],
-    outgoingTransfers: this.outgoingTransfers,
+    outgoingTransfers: [...this.outgoingTransfers.values()],
   });
-}
-
-class DemoPeerConnection implements PeerConnection {
-  private state: FileHarborStateItem["state"] = "connected";
-  private transferCount = 0;
-  private incomingTransfers: FileHarborStateItem["incomingTransfers"] = [];
-  private outgoingTransfers: FileHarborStateItem["outgoingTransfers"] = [];
-
-  getState = (): FileHarborStateItem["state"] => this.state;
-
-  getTransfers = () => ({
-    incomingTransfers: this.incomingTransfers,
-    outgoingTransfers: this.outgoingTransfers,
-  });
-
-  unregister = (): void => {
-    this.state = "offline";
-  };
-
-  addTransfer = (fullFilePath: string): void => {
-    this.transferCount += 1;
-    this.outgoingTransfers = [
-      ...this.outgoingTransfers,
-      {
-        fileName:
-          basename(fullFilePath) || `demo-file-${this.transferCount}.txt`,
-        progress: 0.5,
-      },
-    ];
-  };
 }
