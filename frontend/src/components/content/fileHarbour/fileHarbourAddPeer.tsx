@@ -53,11 +53,11 @@ function toRegisterPeerPayload(
   data: Partial<FormData>
 ): WSFHRegisterPeerMessage["payload"] | null {
   return {
-    selfTag: data.selfTag!,
-    distantTag: data.distantTag!,
+    selfTag: (data.selfTag ?? "").trim(),
+    distantTag: (data.distantTag ?? "").trim(),
     selfPort: Number(data.selfPort) || undefined,
-    selfAddr: data.selfAddr || undefined,
-    relayAddr: data.relayAddr!,
+    selfAddr: data.selfAddr ? data.selfAddr.trim() : undefined,
+    relayAddr: (data.relayAddr ?? "").trim(),
     relayPort: Number(data.relayPort)!,
   };
 }
