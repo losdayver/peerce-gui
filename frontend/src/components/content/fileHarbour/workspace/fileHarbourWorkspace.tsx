@@ -97,9 +97,13 @@ export const FileHarbourWorkspace: React.FC = () => {
       </header>
 
       <div className="file-harbour__workspace-actions">
-        <Button onClick={() => unregisterPeer(activePeer.tag)}>
-          🔌 Disconnect
-        </Button>
+        {activePeer.state == "offline" ? (
+          <Button onClick={() => {}}>🔄️ Reconnect</Button> // todo
+        ) : (
+          <Button onClick={() => unregisterPeer(activePeer.tag)}>
+            🔌 Disconnect
+          </Button>
+        )}
         <Button onClick={() => addTransfer(activePeer.tag)}>
           ➕ Add transfer
         </Button>

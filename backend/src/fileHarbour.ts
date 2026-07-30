@@ -139,6 +139,7 @@ class LivePeerConnection implements PeerConnection {
       case "error":
         return "offline";
       case "connectingToPeer":
+        return "request sent";
       case "connectingToRelay":
         return "connecting";
       case "connectedToPeer":
