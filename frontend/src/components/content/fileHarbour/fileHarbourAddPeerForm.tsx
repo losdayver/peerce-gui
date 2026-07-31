@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
+import type { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
 import type { ContentWindowHeaderAction } from "@main/sideBar";
 import { Modal } from "@modal/modal";
 import { useFileHarbour } from "./fileHarbourContext";
@@ -26,7 +26,7 @@ const formSchema = {
   },
   selfPort: {
     title: "Self port",
-    component: "input",
+    component: "inputNum",
     divideAfter: true,
   },
   relayAddr: {
@@ -37,13 +37,9 @@ const formSchema = {
   },
   relayPort: {
     title: "Relay port",
-    component: "input",
+    component: "inputNum",
     divideAfter: true,
     required: true,
-  },
-  doNotAcceptFiles: {
-    title: "Only allow file send",
-    component: "checkbox",
   },
 } as const satisfies FormSchema;
 
@@ -62,7 +58,7 @@ function toRegisterPeerPayload(
   };
 }
 
-export const FileHarbourAddPeer: React.FC = () => {
+export const FileHarbourAddPeerForm: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const { registerPeer } = useFileHarbour();
   const { getConfig } = useApp();
@@ -88,7 +84,7 @@ export const FileHarbourAddPeer: React.FC = () => {
     >
       <Form
         schema={formSchema}
-        data={config as any}
+        initialData={config as any}
         onConfirm={(data) => {
           const payload = toRegisterPeerPayload(data);
           if (payload) {

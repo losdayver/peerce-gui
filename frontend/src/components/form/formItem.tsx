@@ -37,15 +37,26 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
 export const componentFactory = (
   descriptor: ItemDescriptor,
   value: any,
-  onChange: (val: any) => void,
+  onChange: (val: any) => void
 ) => {
   switch (descriptor.component) {
     case "input":
       return (
         <Input
           {...descriptor}
-          value={value}
+          value={value ?? ""}
           onChange={(event) => onChange(event.target.value)}
+        />
+      );
+    case "inputNum":
+      return (
+        <Input
+          {...descriptor}
+          value={value ?? ""}
+          onChange={(event) => {
+            const value = event.target.value?.replace(/\D/g, "");
+            onChange(value ? Number(value) : null);
+          }}
         />
       );
     case "checkbox":

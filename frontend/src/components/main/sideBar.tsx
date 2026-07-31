@@ -87,7 +87,7 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
     <div className="sidebar-footer">
       <Modal open={configModalOpen} onClose={() => setConfigModalOpen(false)}>
         <Form<FormSchema<GlobalAppConfig>>
-          data={config as any}
+          initialData={config as any}
           schema={{
             relayAddr: {
               component: "input",

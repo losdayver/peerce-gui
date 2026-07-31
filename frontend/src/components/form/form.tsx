@@ -9,6 +9,7 @@ export type ItemDescriptor = (
   | InputItemDescriptor
   | CheckBoxItemDescriptor
   | FileInputItemDescriptor
+  | InputNumItemDescriptor
 ) & {
   title: string;
   required?: boolean;
@@ -18,6 +19,10 @@ export type ItemDescriptor = (
 
 interface InputItemDescriptor extends InputProps {
   component: "input";
+}
+
+interface InputNumItemDescriptor extends InputProps {
+  component: "inputNum";
 }
 
 interface CheckBoxItemDescriptor extends CheckboxProps {
@@ -30,6 +35,7 @@ interface FileInputItemDescriptor extends Omit<FileInputProps, "onPathChange"> {
 
 interface ComponentToTypeMap {
   input: string;
+  inputNum: number;
   checkbox: boolean;
   file: string;
 }
@@ -43,20 +49,20 @@ export type InferDataFromSchema<Schema extends FormSchema> = {
 
 export interface FormProps<Schema extends FormSchema> {
   schema: Schema;
-  data?: InferDataFromSchema<Schema>;
+  initialData?: Partial<InferDataFromSchema<Schema>>;
   onConfirm?: (data: Partial<InferDataFromSchema<Schema>>) => void;
   customValidate?: (data: Partial<InferDataFromSchema<Schema>>) => boolean;
 }
 
 export const Form = <Schema extends FormSchema>({
   schema,
-  data,
+  initialData,
   onConfirm,
   customValidate,
 }: FormProps<Schema>) => {
   const [formData, setFormData] = useState<
     Partial<InferDataFromSchema<Schema>>
-  >(data ?? {});
+  >(initialData ?? {});
 
   const validate = () => {
     const requiredKeys = Object.entries(schema)
