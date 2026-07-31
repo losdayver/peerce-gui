@@ -1,4 +1,4 @@
-import { FileHarborStateItem } from "@commonTypes/file-harbour";
+import { FileHarborStateItem } from "@commonTypes/fileHarbour";
 
 export interface FileHarbourSidebarItemProps extends FileHarborStateItem {
   active?: boolean;

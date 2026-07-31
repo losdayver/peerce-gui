@@ -9,7 +9,13 @@ export const Button: React.FC<ButtonProps> = ({
 }) => (
   <button
     {...props}
-    className={`intrinsic-button${className ? ` ${className}` : ""}`}
+    className={[
+      "intrinsic-button",
+      className,
+      props.disabled ? "disabled" : undefined,
+    ]
+      .filter(Boolean)
+      .join(" ")}
     type={type}
   />
 );

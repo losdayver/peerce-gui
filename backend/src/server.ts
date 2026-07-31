@@ -9,7 +9,10 @@ import { extname, join, resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { WssRouter } from "./wssRouter.js";
 import * as config from "./configProvider.js";
+import { init } from "./db/initAndMigrate.js";
 config;
+
+init();
 
 const logStream = createWriteStream("backend.log", { flags: "a" });
 process.stdout.write = logStream.write.bind(logStream);
@@ -47,8 +50,7 @@ const server = createServer((request, response) => {
 });
 
 const wss = new WebSocketServer({ server });
-
-const wssRouter = new WssRouter(wss);
+new WssRouter(wss);
 
 function allowFrontend(response: ServerResponse): void {
   response.setHeader("Access-Control-Allow-Origin", "*");

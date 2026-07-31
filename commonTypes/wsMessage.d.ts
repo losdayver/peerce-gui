@@ -1,5 +1,5 @@
 import { GlobalAppConfig } from "./app.js";
-import { FileHarborState } from "./file-harbour.js";
+import { FileHarborState } from "./fileHarbour.js";
 
 export interface WSGenericMessage {
   type: string;
@@ -9,12 +9,13 @@ export interface WSGenericMessage {
 export type WSMessages =
   | WSTestMessage
   | WSFHRegisterPeerMessage
-  | WSFHUnregisterPeerMessage
+  | WSFHDisconnectPeerMessage
   | WSFHRequestStateMessage
   | WSFHAddTransferMessage
   | WSFileHarbourState
   | WSAppSaveConfigMessage
-  | WSAppGetConfigMessage;
+  | WSAppGetConfigMessage
+  | WSFHUnregisterPeerMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -38,6 +39,13 @@ export interface WSFHRegisterPeerMessage {
     distantTag: string;
     selfAddr?: string;
     selfPort?: number;
+  };
+}
+
+export interface WSFHDisconnectPeerMessage {
+  type: "file-harbour-disconnect-peer";
+  payload: {
+    tag: string;
   };
 }
 

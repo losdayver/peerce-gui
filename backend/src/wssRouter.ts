@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws";
-import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
+import type { WSGenericMessage, WSMessages } from "@commonTypes/wsMessage.js";
 import { FileHarbor } from "./fileHarbour.js";
 import { getConfig, saveConfig } from "./configProvider.js";
 
@@ -10,8 +10,7 @@ type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
 
 export class WssRouter {
   private wsSet = new Set<WebSocket>();
-  private fileHarbour = new FileHarbor(() => {
-    const state = this.fileHarbour.getConstructedState();
+  private fileHarbour = new FileHarbor((state) => {
     this.sendMessage({ type: "file-harbour-state", payload: state });
   });
 
@@ -39,10 +38,10 @@ export class WssRouter {
     this.wsSet.delete(webSocket);
   };
 
-  sendMessage = (message: WSMessages, ws?: WebSocket) => {
+  sendMessage(message: WSMessages, ws?: WebSocket): void {
     const wsList = ws ? [ws] : this.wsSet;
-    this.wsSet.forEach((ws) => ws.send(JSON.stringify(message)));
-  };
+    wsList.forEach((socket) => socket.send(JSON.stringify(message)));
+  }
 
   private wsMessageTypeHandlerMap: Partial<{
     [Type in WSMessages["type"]]: WsMessageHandler<
@@ -51,6 +50,8 @@ export class WssRouter {
   }> = {
     "file-harbour-register-peer": (_, message) =>
       this.fileHarbour.registerPeer(message.payload),
+    "file-harbour-disconnect-peer": (_, message) =>
+      this.fileHarbour.disconnectPeer(message.payload.tag),
     "file-harbour-unregister-peer": (_, message) =>
       this.fileHarbour.unregisterPeer(message.payload.tag),
     "file-harbour-add-transfer": (_, message) =>

@@ -16,12 +16,18 @@
     color 150ms ease;
 }
 
-.intrinsic-button:hover,
-.intrinsic-button:focus-visible {
+.intrinsic-button:not(.disabled):not(:disabled):hover,
+.intrinsic-button:not(.disabled):not(:disabled):focus-visible {
   border-color: rgba(255, 255, 255, 0.16);
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
   outline: none;
+}
+
+.intrinsic-button.disabled,
+.intrinsic-button:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
 }
 
 .intrinsic-input {

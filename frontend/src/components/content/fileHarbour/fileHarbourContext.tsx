@@ -7,14 +7,14 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import type { FileHarborState } from "@commonTypes/file-harbour.js";
+import type { FileHarborState } from "@commonTypes/fileHarbour.js";
 import type {
   WSFileHarbourState,
   WSGenericMessage,
   WSFHAddTransferMessage,
   WSFHRegisterPeerMessage,
   WSMessages,
-} from "@commonTypes/ws-message.js";
+} from "@commonTypes/wsMessage.js";
 import { wsClientContext } from "@interop/wsClient";
 import { Modal } from "@modal/modal";
 import { Form, type FormSchema } from "@form/form";
@@ -28,6 +28,7 @@ export interface FileHarbourContextValue {
   activePeerTag: string | null;
   setActivePeerTag: (tag: string | null) => void;
   registerPeer: (payload: WSFHRegisterPeerMessage["payload"]) => void;
+  disconnectPeer: (tag: string) => void;
   unregisterPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
   openPeerFileDir: (tag: string) => Promise<void>;
@@ -74,6 +75,13 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     wsClient?.sendMessage({ type: "file-harbour-register-peer", payload });
   };
 
+  const disconnectPeer = (tag: string): void => {
+    wsClient?.sendMessage({
+      type: "file-harbour-disconnect-peer",
+      payload: { tag },
+    });
+  };
+
   const unregisterPeer = (tag: string): void => {
     wsClient?.sendMessage({
       type: "file-harbour-unregister-peer",
@@ -107,6 +115,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         activePeerTag,
         setActivePeerTag,
         registerPeer,
+        disconnectPeer,
         unregisterPeer,
         addTransfer,
         openPeerFileDir,

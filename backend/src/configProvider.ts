@@ -1,17 +1,18 @@
+import { GlobalAppConfig } from "@commonTypes/app.js";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import { homedir } from "os";
 import { join } from "path";
-import { GlobalAppConfig } from "@commonTypes/app.js";
 
 const globalAppConfigBase: GlobalAppConfig = {};
 
 export const homeDirFolderName = ".peerce-gui";
-const homeConfigDir = join(homedir(), homeDirFolderName);
-const configFileBaseName = "config.json";
-const configFullPath = join(homeConfigDir, configFileBaseName);
+export const appHomeDir = join(homedir(), homeDirFolderName);
 
-mkdirSync(homeConfigDir, { recursive: true });
+const configFileBaseName = "config.json";
+const configFullPath = join(appHomeDir, configFileBaseName);
+
+mkdirSync(appHomeDir, { recursive: true });
 const exists = existsSync(configFullPath);
 if (!exists)
   writeFileSync(configFullPath, JSON.stringify(globalAppConfigBase, null, 2));

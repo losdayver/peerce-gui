@@ -1,6 +1,6 @@
 import { Empty } from "@utils";
 import { Button } from "@intrinsic/button";
-import type { FileHarborStateItemTransfer } from "@commonTypes/file-harbour.js";
+import type { FileHarborStateItemTransfer } from "@commonTypes/fileHarbour";
 import { useFileHarbour } from "@components/content/fileHarbour/fileHarbourContext";
 
 function getInitials(tag: string): string {
@@ -68,8 +68,14 @@ function TransferSection({
 }
 
 export const FileHarbourWorkspace: React.FC = () => {
-  const { state, activePeerTag, unregisterPeer, addTransfer, openPeerFileDir } =
-    useFileHarbour();
+  const {
+    state,
+    activePeerTag,
+    disconnectPeer,
+    unregisterPeer,
+    addTransfer,
+    openPeerFileDir,
+  } = useFileHarbour();
   const activePeer = state.items.find((peer) => peer.tag === activePeerTag);
 
   if (!activePeer) {
@@ -98,13 +104,21 @@ export const FileHarbourWorkspace: React.FC = () => {
 
       <div className="file-harbour__workspace-actions">
         {activePeer.state == "offline" ? (
-          <Button onClick={() => {}}>🔄️ Reconnect</Button> // todo
+          <>
+            <Button onClick={() => unregisterPeer(activePeer.tag)}>
+              🗑️ Delete
+            </Button>
+            <Button onClick={() => {}}>🔄️ Reconnect</Button>
+          </>
         ) : (
-          <Button onClick={() => unregisterPeer(activePeer.tag)}>
+          <Button onClick={() => disconnectPeer(activePeer.tag)}>
             🔌 Disconnect
           </Button>
         )}
-        <Button onClick={() => addTransfer(activePeer.tag)}>
+        <Button
+          disabled={activePeer.state != "connected"}
+          onClick={() => addTransfer(activePeer.tag)}
+        >
           ➕ Add transfer
         </Button>
         <Button onClick={() => openPeerFileDir(activePeer.tag)}>

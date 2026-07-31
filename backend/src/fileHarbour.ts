@@ -1,16 +1,19 @@
 import type {
   FileHarborState,
   FileHarborStateItem,
-} from "@commonTypes/file-harbour.js";
+} from "@commonTypes/fileHarbour.js";
 import { basename, join } from "node:path";
-import { WSFHRegisterPeerMessage } from "@commonTypes/ws-message.js";
+import { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
 import { SimplePeer } from "peerce";
 import { writeFile, readFile } from "fs/promises";
 import { homedir } from "os";
 import { homeDirFolderName } from "./configProvider.js";
 import { mkdir } from "node:fs/promises";
-
-const demoPeerTag = "demo-peer";
+import {
+  deleteConnection,
+  getAllConnections,
+  insertNewConnection,
+} from "./db/provider.js";
 
 interface PeerConnection {
   getState: () => FileHarborStateItem["state"];
@@ -18,37 +21,87 @@ interface PeerConnection {
     FileHarborStateItem,
     "incomingTransfers" | "outgoingTransfers"
   >;
-  unregister: () => void;
+  disconnect: () => void;
+  clearListeners: () => void;
   addTransfer: (fullFilePath: string) => void;
 }
 
 export class FileHarbor {
-  constructor(private sendUpdateMessage: () => void) {
+  constructor(private sendUpdateMessage: (state: FileHarborState) => void) {
+    const connections = getAllConnections();
+    connections.forEach(
+      ({
+        distant_tag,
+        relay_addr,
+        relay_port,
+        self_addr,
+        self_port,
+        self_tag,
+      }) =>
+        this.registerPeer(
+          {
+            distantTag: distant_tag,
+            relayAddr: relay_addr,
+            relayPort: relay_port,
+            selfAddr: self_addr ?? undefined,
+            selfPort: self_port ?? undefined,
+            selfTag: self_tag,
+          },
+          true
+        )
+    );
+
     setInterval(() => {
-      this.sendUpdateMessage();
+      this.notifyState();
     }, 500);
   }
 
   peerConnectionMap = new Map<string, PeerConnection>();
 
-  registerPeer = (payload: WSFHRegisterPeerMessage["payload"]) => {
+  private notifyState = (): void => {
+    this.sendUpdateMessage(this.getConstructedState());
+  };
+
+  registerPeer = (
+    payload: WSFHRegisterPeerMessage["payload"],
+    doNotInsert = false
+  ) => {
     // todo check if exists
 
     const connection = new LivePeerConnection(payload);
     this.peerConnectionMap.set(payload.distantTag, connection);
-    this.sendUpdateMessage();
+    const { distantTag, relayAddr, relayPort, selfTag, selfAddr, selfPort } =
+      payload;
+    if (!doNotInsert)
+      insertNewConnection({
+        distant_tag: distantTag,
+        self_tag: selfTag,
+        relay_addr: relayAddr,
+        relay_port: relayPort,
+        self_addr: selfAddr ?? null,
+        self_port: selfPort ?? null,
+      });
+    this.notifyState();
   };
   unregisterPeer = (tag: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
-    peerConn.unregister();
-    this.sendUpdateMessage();
+    peerConn.clearListeners();
+    this.peerConnectionMap.delete(tag);
+    deleteConnection(tag);
+    this.notifyState();
+  };
+  disconnectPeer = (tag: string): void => {
+    const peerConn = this.peerConnectionMap.get(tag);
+    if (!peerConn) return;
+    peerConn.disconnect();
+    this.notifyState();
   };
   addTransfer = (tag: string, fullFilePath: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
     peerConn.addTransfer(fullFilePath);
-    this.sendUpdateMessage();
+    this.notifyState();
   };
   getConstructedState = (): FileHarborState => {
     const items: FileHarborStateItem[] = Array.from(
@@ -147,8 +200,12 @@ class LivePeerConnection implements PeerConnection {
     }
   };
 
-  unregister = () => {
+  disconnect = () => {
     this.peer.close();
+  };
+
+  clearListeners = (): void => {
+    this.peer.removeAllListeners();
   };
 
   addTransfer = async (fullFilePath: string) => {
