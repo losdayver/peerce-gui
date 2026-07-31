@@ -51,10 +51,12 @@ function toRegisterPeerPayload(
   return {
     selfTag: (data.selfTag ?? "").trim(),
     distantTag: (data.distantTag ?? "").trim(),
-    selfPort: Number(data.selfPort) || undefined,
+    selfPort: data.selfPort
+      ? Math.max(data.selfPort, Math.min(data.selfPort, 65525))
+      : undefined,
     selfAddr: data.selfAddr ? data.selfAddr.trim() : undefined,
     relayAddr: (data.relayAddr ?? "").trim(),
-    relayPort: Number(data.relayPort)!,
+    relayPort: Math.max(data.relayPort!, Math.min(data.relayPort!, 65525)),
   };
 }
 

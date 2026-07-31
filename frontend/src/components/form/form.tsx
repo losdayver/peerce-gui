@@ -82,9 +82,11 @@ export const Form = <Schema extends FormSchema>({
           divideAfter={descriptor.divideAfter}
         >
           {componentFactory(descriptor, formData[fldKey], (val: any) =>
-            setFormData((prev) => {
-              return { ...prev, [fldKey]: val };
-            })
+            setFormData((prev) =>
+              Object.is(prev[fldKey], val)
+                ? prev
+                : { ...prev, [fldKey]: val }
+            )
           )}
         </FormItem>
       ))}

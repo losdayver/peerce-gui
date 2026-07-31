@@ -94,7 +94,7 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
               title: "Default relay address",
             },
             relayPort: {
-              component: "input",
+              component: "inputNum",
               title: "Default relay port",
             },
             selfTag: {
