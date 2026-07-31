@@ -30,6 +30,7 @@ export interface FileHarbourContextValue {
   registerPeer: (payload: WSFHRegisterPeerMessage["payload"]) => void;
   disconnectPeer: (tag: string) => void;
   unregisterPeer: (tag: string) => void;
+  reconnectPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
   openPeerFileDir: (tag: string) => Promise<void>;
 }
@@ -89,6 +90,13 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     });
   };
 
+  const reconnectPeer = (tag: string): void => {
+    wsClient?.sendMessage({
+      type: "file-harbour-reconnect-peer",
+      payload: { tag },
+    });
+  };
+
   const addTransfer = (tag: string): void => {
     setTransferModalOpen(true);
   };
@@ -117,6 +125,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         registerPeer,
         disconnectPeer,
         unregisterPeer,
+        reconnectPeer,
         addTransfer,
         openPeerFileDir,
       }}

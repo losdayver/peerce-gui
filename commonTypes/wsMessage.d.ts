@@ -15,7 +15,8 @@ export type WSMessages =
   | WSFileHarbourState
   | WSAppSaveConfigMessage
   | WSAppGetConfigMessage
-  | WSFHUnregisterPeerMessage;
+  | WSFHUnregisterPeerMessage
+  | WSFHReconnectPeerMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -51,6 +52,13 @@ export interface WSFHDisconnectPeerMessage {
 
 export interface WSFHUnregisterPeerMessage {
   type: "file-harbour-unregister-peer";
+  payload: {
+    tag: string;
+  };
+}
+
+export interface WSFHReconnectPeerMessage {
+  type: "file-harbour-reconnect-peer";
   payload: {
     tag: string;
   };

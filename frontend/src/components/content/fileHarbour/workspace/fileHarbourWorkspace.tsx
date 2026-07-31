@@ -73,6 +73,7 @@ export const FileHarbourWorkspace: React.FC = () => {
     activePeerTag,
     disconnectPeer,
     unregisterPeer,
+    reconnectPeer,
     addTransfer,
     openPeerFileDir,
   } = useFileHarbour();
@@ -108,7 +109,9 @@ export const FileHarbourWorkspace: React.FC = () => {
             <Button onClick={() => unregisterPeer(activePeer.tag)}>
               🗑️ Delete
             </Button>
-            <Button onClick={() => {}}>🔄️ Reconnect</Button>
+            <Button onClick={() => reconnectPeer(activePeer.tag)}>
+              🔄️ Reconnect
+            </Button>
           </>
         ) : (
           <Button onClick={() => disconnectPeer(activePeer.tag)}>

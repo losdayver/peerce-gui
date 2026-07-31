@@ -1,7 +1,11 @@
 import { join } from "node:path";
 import { appHomeDir } from "../configProvider.js";
-import { DatabaseSync } from "node:sqlite";
-import type { FHConnectionTable } from "./initAndMigrate.js";
+import { DatabaseSync, type SQLInputValue } from "node:sqlite";
+import { FHConnectionTransferTableState } from "./initAndMigrate.js";
+import type {
+  FHConnectionTable,
+  FHConnectionTransferTable,
+} from "./initAndMigrate.js";
 
 const dbFileBaseName = "persist.db";
 const dbFullPath = join(appHomeDir, dbFileBaseName);
@@ -39,13 +43,63 @@ export const deleteConnection = (
   );
 };
 
+export const insertNewConnectionTransfer = (
+  transfer: Omit<FHConnectionTransferTable, "state"> & {
+    state?: FHConnectionTransferTable["state"];
+  }
+): void => {
+  db.prepare(
+    `
+      insert into fh_connection_transfer (distant_tag, file_name, incoming, state)
+      values (?, ?, ?, ?)
+      on conflict(distant_tag, file_name, incoming) do update set
+        state = excluded.state
+    `
+  ).run(
+    transfer.distant_tag,
+    transfer.file_name,
+    transfer.incoming,
+    transfer.state ?? FHConnectionTransferTableState.INTERRUPTED
+  );
+};
+
 export const getAllConnections = (): FHConnectionTable[] =>
   selectAll<FHConnectionTable>(`
     select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port
     from fh_connection
   `);
 
+export const getConnectionsByDistantTag = (
+  distant_tag: FHConnectionTable["distant_tag"]
+): FHConnectionTable | undefined =>
+  selectAll<FHConnectionTable>(
+    `
+      select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port
+      from fh_connection
+      where distant_tag = ?
+    `,
+    [distant_tag]
+  )[0];
+
+export const getAllConnectionTransfers = (): FHConnectionTransferTable[] =>
+  selectAll<FHConnectionTransferTable>(`
+    select distant_tag, file_name, incoming, state
+    from fh_connection_transfer
+  `);
+
+export const getConnectionTransfersByDistantTag = (
+  distant_tag: FHConnectionTable["distant_tag"]
+): FHConnectionTransferTable[] =>
+  selectAll<FHConnectionTransferTable>(
+    `
+      select distant_tag, file_name, incoming, state
+      from fh_connection_transfer
+      where distant_tag = ?
+    `,
+    [distant_tag]
+  );
+
 /** The migrations are the source of truth for the returned row shape. */
-function selectAll<T>(sql: string): T[] {
-  return db.prepare(sql).all() as unknown as T[];
+function selectAll<T>(sql: string, params?: SQLInputValue[]): T[] {
+  return db.prepare(sql).all(...(params ?? [])) as unknown as T[];
 }

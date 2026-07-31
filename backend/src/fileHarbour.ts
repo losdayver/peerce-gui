@@ -11,9 +11,18 @@ import { homeDirFolderName } from "./configProvider.js";
 import { mkdir } from "node:fs/promises";
 import {
   deleteConnection,
+  getAllConnectionTransfers,
   getAllConnections,
+  getConnectionTransfersByDistantTag,
+  getConnectionsByDistantTag,
   insertNewConnection,
+  insertNewConnectionTransfer,
 } from "./db/provider.js";
+import {
+  FHConnectionTransferTableIncoming,
+  FHConnectionTransferTableState,
+} from "./db/initAndMigrate.js";
+import type { FHConnectionTransferTable } from "./db/initAndMigrate.js";
 
 interface PeerConnection {
   getState: () => FileHarborStateItem["state"];
@@ -21,8 +30,9 @@ interface PeerConnection {
     FileHarborStateItem,
     "incomingTransfers" | "outgoingTransfers"
   >;
-  disconnect: () => void;
+  disconnect: () => Promise<void>;
   clearListeners: () => void;
+  restoreTransfer: (transfer: FHConnectionTransferTable) => void;
   addTransfer: (fullFilePath: string) => void;
 }
 
@@ -51,12 +61,19 @@ export class FileHarbor {
         )
     );
 
+    getAllConnectionTransfers().forEach((transfer) => {
+      this.peerConnectionMap
+        .get(transfer.distant_tag)
+        ?.restoreTransfer(transfer);
+    });
+
     setInterval(() => {
       this.notifyState();
     }, 500);
   }
 
   peerConnectionMap = new Map<string, PeerConnection>();
+  private reconnectingPeerTags = new Set<string>();
 
   private notifyState = (): void => {
     this.sendUpdateMessage(this.getConstructedState());
@@ -97,10 +114,55 @@ export class FileHarbor {
     peerConn.disconnect();
     this.notifyState();
   };
+  reconnectPeer = async (tag: string): Promise<void> => {
+    const peerConn = this.peerConnectionMap.get(tag);
+    if (!peerConn || this.reconnectingPeerTags.has(tag)) return;
+
+    this.reconnectingPeerTags.add(tag);
+    try {
+      const dbConnection = getConnectionsByDistantTag(tag);
+      if (!dbConnection) return;
+
+      const transfers = getConnectionTransfersByDistantTag(tag);
+      await peerConn.disconnect();
+      peerConn.clearListeners();
+
+      if (this.peerConnectionMap.get(tag) !== peerConn) return;
+
+      const {
+        distant_tag,
+        relay_addr,
+        relay_port,
+        self_addr,
+        self_port,
+        self_tag,
+      } = dbConnection;
+
+      const connection = new LivePeerConnection({
+        distantTag: distant_tag,
+        relayAddr: relay_addr,
+        relayPort: relay_port,
+        selfTag: self_tag,
+        selfAddr: self_addr ?? undefined,
+        selfPort: self_port ?? undefined,
+      });
+
+      transfers.forEach((transfer) => connection.restoreTransfer(transfer));
+      this.peerConnectionMap.set(tag, connection);
+      this.notifyState();
+    } finally {
+      this.reconnectingPeerTags.delete(tag);
+    }
+  };
   addTransfer = (tag: string, fullFilePath: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
     peerConn.addTransfer(fullFilePath);
+    insertNewConnectionTransfer({
+      distant_tag: tag,
+      file_name: basename(fullFilePath),
+      incoming: FHConnectionTransferTableIncoming.FALSE,
+    });
     this.notifyState();
   };
   getConstructedState = (): FileHarborState => {
@@ -149,6 +211,11 @@ class LivePeerConnection implements PeerConnection {
 
   onIncomingTransmissionStart = (fileName: string) => {
     this.incomingTransfers.set(fileName, { fileName, progress: 0 });
+    insertNewConnectionTransfer({
+      distant_tag: this.distantTag,
+      file_name: basename(fileName),
+      incoming: FHConnectionTransferTableIncoming.TRUE,
+    });
   };
 
   onIncomingTransmissionPercentageChange = (
@@ -158,6 +225,13 @@ class LivePeerConnection implements PeerConnection {
     const transfer = this.incomingTransfers.get(fileName);
     if (!transfer) return;
     transfer.progress = progress;
+    if (progress == 1)
+      insertNewConnectionTransfer({
+        distant_tag: this.distantTag,
+        file_name: basename(transfer.fileName),
+        incoming: FHConnectionTransferTableIncoming.TRUE,
+        state: FHConnectionTransferTableState.COMPLETED,
+      });
   };
 
   onOutgoingTransmissionPercentageChange = (
@@ -167,6 +241,13 @@ class LivePeerConnection implements PeerConnection {
     const transfer = this.outgoingTransfers.get(fileName);
     if (!transfer) return;
     transfer.progress = progress;
+    if (progress == 1)
+      insertNewConnectionTransfer({
+        distant_tag: this.distantTag,
+        file_name: basename(transfer.fileName),
+        incoming: FHConnectionTransferTableIncoming.FALSE,
+        state: FHConnectionTransferTableState.COMPLETED,
+      });
   };
 
   onFullMessage = async ({ buffer, fileName }) => {
@@ -200,12 +281,24 @@ class LivePeerConnection implements PeerConnection {
     }
   };
 
-  disconnect = () => {
-    this.peer.close();
-  };
+  disconnect = (): Promise<void> => this.peer.close();
 
   clearListeners = (): void => {
     this.peer.removeAllListeners();
+  };
+
+  restoreTransfer = (transfer: FHConnectionTransferTable): void => {
+    const restoredTransfer = {
+      fileName: transfer.file_name,
+      progress:
+        transfer.state === FHConnectionTransferTableState.COMPLETED ? 1 : 0,
+    };
+
+    if (transfer.incoming === FHConnectionTransferTableIncoming.TRUE) {
+      this.incomingTransfers.set(transfer.file_name, restoredTransfer);
+    } else {
+      this.outgoingTransfers.set(transfer.file_name, restoredTransfer);
+    }
   };
 
   addTransfer = async (fullFilePath: string) => {

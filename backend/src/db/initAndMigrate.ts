@@ -42,8 +42,11 @@ export const init = () => {
       distant_tag   text references fh_connection(distant_tag),
       file_name     text,
       incoming      integer,
-      state         integer
+      state         integer,
+      unique (distant_tag, file_name, incoming)
     );
     create index if not exists ix_fh_conn_distant_tag on fh_connection_transfer(distant_tag);
+    create unique index if not exists ux_fh_conn_transfer_identity
+      on fh_connection_transfer(distant_tag, file_name, incoming);
     `);
 };
