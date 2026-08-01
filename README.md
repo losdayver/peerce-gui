@@ -40,3 +40,7 @@ Create a production bundle with:
 ```bash
 npm run build
 ```
+
+## License
+
+This project is available under the [MIT License](./LICENSE).
