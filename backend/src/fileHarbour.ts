@@ -37,7 +37,10 @@ interface PeerConnection {
 }
 
 export class FileHarbor {
-  constructor(private sendUpdateMessage: (state: FileHarborState) => void) {
+  constructor(
+    private sendUpdateMessage: (state: FileHarborState) => void,
+    public sendUIMessage: (message: string) => void
+  ) {
     const connections = getAllConnections();
     connections.forEach(
       ({
@@ -85,7 +88,7 @@ export class FileHarbor {
   ) => {
     // todo check if exists
 
-    const connection = new LivePeerConnection(payload);
+    const connection = new LivePeerConnection(this, payload);
     this.peerConnectionMap.set(payload.distantTag, connection);
     const { distantTag, relayAddr, relayPort, selfTag, selfAddr, selfPort } =
       payload;
@@ -138,7 +141,7 @@ export class FileHarbor {
         self_tag,
       } = dbConnection;
 
-      const connection = new LivePeerConnection({
+      const connection = new LivePeerConnection(this, {
         distantTag: distant_tag,
         relayAddr: relay_addr,
         relayPort: relay_port,
@@ -190,7 +193,10 @@ class LivePeerConnection implements PeerConnection {
   >();
   private distantTag: string;
 
-  constructor(payload: WSFHRegisterPeerMessage["payload"]) {
+  constructor(
+    private fileHarbour: FileHarbor,
+    payload: WSFHRegisterPeerMessage["payload"]
+  ) {
     this.peer = new SimplePeer(payload);
     this.distantTag = payload.distantTag;
     this.peer.on("onFullMessage", this.onFullMessage);
@@ -206,6 +212,14 @@ class LivePeerConnection implements PeerConnection {
       "onOutgoingTransmissionPercentageChange",
       this.onOutgoingTransmissionPercentageChange
     );
+    this.peer.on("onConnectedToPeer", () => {
+      this.fileHarbour.sendUIMessage(`🔌 Connected to "${this.distantTag}"`);
+    });
+    this.peer.on("onClosing", () => {
+      this.fileHarbour.sendUIMessage(
+        `🔌 Disconnected from "${this.distantTag}"`
+      );
+    });
     void this.peer.requestSessionViaRelayAsync();
   }
 
@@ -216,6 +230,9 @@ class LivePeerConnection implements PeerConnection {
       file_name: basename(fileName),
       incoming: FHConnectionTransferTableIncoming.TRUE,
     });
+    this.fileHarbour.sendUIMessage(
+      `📩 New incoming transmission from ${this.distantTag}, sending "${fileName}"`
+    );
   };
 
   onIncomingTransmissionPercentageChange = (
@@ -260,6 +277,7 @@ class LivePeerConnection implements PeerConnection {
     );
     await mkdir(distantPeerDir, { recursive: true });
     await writeFile(join(distantPeerDir, basename(fileName)), buffer);
+    this.fileHarbour.sendUIMessage(`📁 "${fileName}" saved`);
   };
 
   getState = (): FileHarborStateItem["state"] => {

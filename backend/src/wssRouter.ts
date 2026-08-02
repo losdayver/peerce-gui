@@ -10,9 +10,16 @@ type WsMessageHandler<M extends WSGenericMessage = WSGenericMessage> = (
 
 export class WssRouter {
   private wsSet = new Set<WebSocket>();
-  private fileHarbour = new FileHarbor((state) => {
-    this.sendMessage({ type: "file-harbour-state", payload: state });
-  });
+  private fileHarbour = new FileHarbor(
+    (state) => {
+      this.sendMessage({ type: "file-harbour-state", payload: state });
+    },
+    (message) =>
+      this.sendMessage({
+        type: "file-harbour-ui-message",
+        payload: { message },
+      })
+  );
 
   private genericMessageHandler = async (webSocket: WebSocket, message) => {
     console.log("received generic message", message);

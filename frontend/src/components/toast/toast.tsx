@@ -7,7 +7,7 @@ import {
 } from "react";
 import { createRoot } from "react-dom/client";
 
-const toastLifetimeMs = 2500;
+const toastLifetimeMs = 3000;
 let nextToastKey = 0;
 
 const toastHandlerRef = createRef<ToastMessageHandler>();

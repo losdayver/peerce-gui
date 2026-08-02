@@ -16,7 +16,8 @@ export type WSMessages =
   | WSAppSaveConfigMessage
   | WSAppGetConfigMessage
   | WSFHUnregisterPeerMessage
-  | WSFHReconnectPeerMessage;
+  | WSFHReconnectPeerMessage
+  | WSFileHarbourUIMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -86,5 +87,10 @@ export interface WSAppSaveConfigMessage {
 export interface WSFileHarbourState {
   type: "file-harbour-state";
   payload: FileHarborState;
+}
+
+export interface WSFileHarbourUIMessage {
+  type: "file-harbour-ui-message";
+  payload: { message: string };
 }
 //#endregion

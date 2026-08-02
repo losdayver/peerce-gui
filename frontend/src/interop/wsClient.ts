@@ -1,4 +1,4 @@
-import type { WSGenericMessage, WSMessages } from "@commonTypes/ws-message.js";
+import type { WSGenericMessage, WSMessages } from "@commonTypes/wsMessage.js";
 import { createContext, RefObject } from "react";
 
 export const wsClientContext = createContext<RefObject<WsClient | null>>({

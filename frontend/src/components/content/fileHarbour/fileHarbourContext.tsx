@@ -18,6 +18,7 @@ import type {
 import { wsClientContext } from "@interop/wsClient";
 import { Modal } from "@modal/modal";
 import { Form, type FormSchema } from "@form/form";
+import { showToastMessage } from "@components/toast/toast";
 
 const transferFormSchema = {
   fullFilePath: { component: "file", title: "File", required: true },
@@ -54,14 +55,16 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
 
     const onMessage = (event: Event): void => {
       const message = (event as CustomEvent<WSMessages>).detail;
-      if (!isFileHarbourState(message)) return;
-
-      setState(message.payload);
-      setActivePeerTag((currentTag) =>
-        message.payload.items.some((peer) => peer.tag === currentTag)
-          ? currentTag
-          : null
-      );
+      if (message.type == "file-harbour-state") {
+        setState(message.payload);
+        setActivePeerTag((currentTag) =>
+          message.payload.items.some((peer) => peer.tag === currentTag)
+            ? currentTag
+            : null
+        );
+      } else if (message.type == "file-harbour-ui-message") {
+        showToastMessage({ title: message.payload.message });
+      }
     };
 
     wsClient.eventEmitter.addEventListener("message", onMessage);

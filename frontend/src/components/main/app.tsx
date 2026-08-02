@@ -77,7 +77,7 @@ export const App: React.FC = () => {
       content: FileHarbour,
       headerActions: fileHarbourHeaderActions,
     },
-    { title: "Test Item", itemKey: "test-item" },
+    // { title: "Test Item", itemKey: "test-item" },
   ];
 
   const wsClientRef = useRef<WsClient | null>(null);
