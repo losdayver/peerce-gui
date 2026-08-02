@@ -277,7 +277,7 @@ class LivePeerConnection implements PeerConnection {
     );
     await mkdir(distantPeerDir, { recursive: true });
     await writeFile(join(distantPeerDir, basename(fileName)), buffer);
-    this.fileHarbour.sendUIMessage(`📁 "${fileName}" saved`);
+    this.fileHarbour.sendUIMessage(`📄 "${fileName}" saved`);
   };
 
   getState = (): FileHarborStateItem["state"] => {

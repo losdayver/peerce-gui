@@ -45,7 +45,7 @@ function TransferSection({
             const content = (
               <>
                 <span className="file-harbour__transfer-name">
-                  📁 {transfer.fileName}
+                  📄 {transfer.fileName}
                 </span>
                 <div className="file-harbour__transfer-progress">
                   <div
