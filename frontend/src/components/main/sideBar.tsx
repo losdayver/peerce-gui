@@ -4,6 +4,11 @@ import { Modal } from "@components/modal/modal";
 import { createContext, useContext, useState } from "react";
 import { GlobalAppConfig } from "@commonTypes/app";
 import { useApp } from "./app";
+import {
+  addressFormValidator,
+  portFormValidator,
+  tagFormValidator,
+} from "@components/content/fileHarbour/commonFormValidators";
 
 export interface SideBarProps {
   header?: React.ReactNode;
@@ -85,21 +90,31 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
   const [configModalOpen, setConfigModalOpen] = useState(false);
   return (
     <div className="sidebar-footer">
-      <Modal open={configModalOpen} onClose={() => setConfigModalOpen(false)}>
+      <Modal
+        title="Settings"
+        open={configModalOpen}
+        onClose={() => setConfigModalOpen(false)}
+      >
         <Form<FormSchema<GlobalAppConfig>>
           initialData={config as any}
           schema={{
+            selfTag: {
+              component: "input",
+              title: "Self tag",
+              validator: tagFormValidator,
+              required: true,
+            },
             relayAddr: {
               component: "input",
               title: "Default relay address",
+              validator: addressFormValidator,
+              required: true,
             },
             relayPort: {
               component: "inputNum",
               title: "Default relay port",
-            },
-            selfTag: {
-              component: "input",
-              title: "Self tag",
+              validator: portFormValidator,
+              required: true,
             },
           }}
           onConfirm={(data) => {

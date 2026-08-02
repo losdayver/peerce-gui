@@ -6,57 +6,70 @@ import { useFileHarbour } from "./fileHarbourContext";
 import { Form, type FormSchema, type InferDataFromSchema } from "@form/form";
 import { useApp } from "@components/main/app";
 import { GlobalAppConfig } from "@commonTypes/app";
+import {
+  addressFormValidator,
+  portFormValidator,
+  tagFormValidator,
+} from "./commonFormValidators";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "Add new peer", fn: null },
 ];
 
 const formSchema = {
-  selfTag: { title: "Self tag", component: "input", required: true },
+  selfTag: {
+    title: "Self tag",
+    component: "input",
+    required: true,
+    validator: tagFormValidator,
+  },
   distantTag: {
     title: "Peer tag",
     component: "input",
     divideAfter: true,
     required: true,
+    validator: tagFormValidator,
   },
   selfAddr: {
     title: "Self address",
     component: "input",
     placeholder: "XXX.XXX.XXX.XXX",
+    validator: addressFormValidator,
   },
   selfPort: {
     title: "Self port",
     component: "inputNum",
     divideAfter: true,
+    validator: portFormValidator,
   },
   relayAddr: {
     title: "Relay address",
     component: "input",
     placeholder: "XXX.XXX.XXX.XXX",
     required: true,
+    validator: addressFormValidator,
   },
   relayPort: {
     title: "Relay port",
     component: "inputNum",
     divideAfter: true,
     required: true,
+    validator: portFormValidator,
   },
 } as const satisfies FormSchema;
 
 type FormData = InferDataFromSchema<typeof formSchema>;
 
 function toRegisterPeerPayload(
-  data: Partial<FormData>
+  data: FormData
 ): WSFHRegisterPeerMessage["payload"] | null {
   return {
-    selfTag: (data.selfTag ?? "").trim(),
-    distantTag: (data.distantTag ?? "").trim(),
-    selfPort: data.selfPort
-      ? Math.max(data.selfPort, Math.min(data.selfPort, 65525))
-      : undefined,
-    selfAddr: data.selfAddr ? data.selfAddr.trim() : undefined,
-    relayAddr: (data.relayAddr ?? "").trim(),
-    relayPort: Math.max(data.relayPort!, Math.min(data.relayPort!, 65525)),
+    selfTag: data.selfTag.trim(),
+    distantTag: data.distantTag.trim(),
+    selfPort: data.selfPort,
+    selfAddr: data.selfAddr,
+    relayAddr: data.relayAddr,
+    relayPort: data.relayPort,
   };
 }
 

@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { ItemDescriptor } from "./form";
 import { Input } from "@intrinsic/input";
 import { Checkbox } from "@intrinsic/checkbox";
@@ -9,6 +8,13 @@ export interface FormItemProps {
   required?: boolean;
   key?: string;
   divideAfter?: boolean;
+  notify?: FormItemNotify;
+}
+
+export interface FormItemNotify<Keys extends string = string> {
+  fld: Keys;
+  severity: "warning" | "error";
+  message?: string;
 }
 
 export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
@@ -17,9 +23,10 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
   title,
   key,
   divideAfter,
+  notify,
 }) => {
   return (
-    <div className="form__item" key={key}>
+    <div className={`form__item ${notify ? notify.severity : ""}`} key={key}>
       <span className="form__label">
         {title}:
         {required && (
@@ -28,7 +35,19 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
           </span>
         )}
       </span>
-      <span className="form__control">{children}</span>
+      <span
+        className={`form__control${notify?.message ? " form__control--with-message" : ""}`}
+      >
+        {children}
+        {notify?.message && (
+          <span
+            className="form__message"
+            role={notify.severity === "error" ? "alert" : "status"}
+          >
+            {notify.message}
+          </span>
+        )}
+      </span>
       {divideAfter && <hr className="form__divider" />}
     </div>
   );
