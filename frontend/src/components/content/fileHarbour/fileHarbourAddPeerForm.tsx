@@ -11,6 +11,7 @@ import {
   portFormValidator,
   tagFormValidator,
 } from "./commonFormValidators";
+import { showToastMessage } from "@components/toast/toast";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "Add new peer", fn: null },
@@ -105,6 +106,7 @@ export const FileHarbourAddPeerForm: React.FC = () => {
           if (payload) {
             registerPeer(payload);
             setModalOpen(false);
+            showToastMessage({ title: "🔌 New peer registered" });
           }
         }}
       />
