@@ -18,6 +18,7 @@ interface TransferSectionProps {
   title: string;
   emptyMessage: string;
   transfers: FileHarborStateItemTransfer[];
+  onTransferClick?: (transfer: FileHarborStateItemTransfer) => void;
 }
 
 function TransferSection({
@@ -25,6 +26,7 @@ function TransferSection({
   title,
   emptyMessage,
   transfers,
+  onTransferClick,
 }: TransferSectionProps) {
   return (
     <section className="file-harbour__transfers-section" aria-labelledby={id}>
@@ -40,12 +42,8 @@ function TransferSection({
             const progress = Math.round(
               Math.min(1, Math.max(0, transfer.progress)) * 100
             );
-
-            return (
-              <article
-                className="file-harbour__transfer"
-                key={transfer.fileName}
-              >
+            const content = (
+              <>
                 <span className="file-harbour__transfer-name">
                   📁 {transfer.fileName}
                 </span>
@@ -58,6 +56,25 @@ function TransferSection({
                 <span className="file-harbour__transfer-percent">
                   {progress}%
                 </span>
+              </>
+            );
+
+            return onTransferClick ? (
+              <button
+                className="file-harbour__transfer file-harbour__transfer--clickable"
+                key={transfer.fileName}
+                type="button"
+                title="Open containing folder"
+                onClick={() => onTransferClick(transfer)}
+              >
+                {content}
+              </button>
+            ) : (
+              <article
+                className="file-harbour__transfer"
+                key={transfer.fileName}
+              >
+                {content}
               </article>
             );
           })}
@@ -135,6 +152,7 @@ export const FileHarbourWorkspace: React.FC = () => {
           title="Incoming"
           emptyMessage="No incoming transfers"
           transfers={activePeer.incomingTransfers}
+          onTransferClick={() => openPeerFileDir(activePeer.tag)}
         />
         <TransferSection
           id="outgoing-transfers-title"
