@@ -3,5 +3,16 @@
   "identifier": "default",
   "description": "Default capabilities for the main window.",
   "windows": ["main"],
-  "permissions": ["core:default", "dialog:allow-open"]
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        {
+          "path": "$HOME/.peerce-gui/file-harbour/transmissions/**"
+        }
+      ]
+    }
+  ]
 }

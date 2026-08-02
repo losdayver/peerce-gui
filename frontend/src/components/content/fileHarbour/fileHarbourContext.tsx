@@ -1,5 +1,5 @@
-import { open } from "@tauri-apps/plugin-dialog";
 import { homeDir, join } from "@tauri-apps/api/path";
+import { openPath } from "@tauri-apps/plugin-opener";
 import {
   createContext,
   useContext,
@@ -109,14 +109,21 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
   };
 
   const openPeerFileDir = async (tag: string) => {
-    const transmissionsDir = await join(
-      await homeDir(),
-      ".peerce-gui",
-      "file-harbour",
-      "transmissions",
-      tag
-    );
-    open({ defaultPath: transmissionsDir });
+    try {
+      const transmissionsDir = await join(
+        await homeDir(),
+        ".peerce-gui",
+        "file-harbour",
+        "transmissions",
+        tag
+      );
+      await openPath(transmissionsDir);
+    } catch (error: unknown) {
+      showToastMessage({
+        title: "Could not open folder",
+        content: error instanceof Error ? error.message : String(error),
+      });
+    }
   };
 
   return (
