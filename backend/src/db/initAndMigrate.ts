@@ -27,6 +27,8 @@ export interface FHConnectionTransferTable {
 }
 
 export const init = () => {
+  db.exec("pragma foreign_keys = on;");
+
   db.exec(`
     create table if not exists fh_connection (
       distant_tag   text primary key,
@@ -39,7 +41,7 @@ export const init = () => {
     `);
   db.exec(`
     create table if not exists fh_connection_transfer (
-      distant_tag   text references fh_connection(distant_tag),
+      distant_tag   text references fh_connection(distant_tag) on delete cascade,
       file_name     text,
       incoming      integer,
       state         integer,
