@@ -101,6 +101,17 @@ export const FileHarbourAddPeerForm: React.FC = () => {
       <Form
         schema={formSchema}
         initialData={config as any}
+        customValidate={({ distantTag, selfTag }) => {
+          if (distantTag == selfTag)
+            return [
+              {
+                fld: "distantTag",
+                severity: "warning",
+                message: "Distant tag cannot be the same as self tag",
+              },
+            ];
+          return [];
+        }}
         onConfirm={(data) => {
           const payload = toRegisterPeerPayload(data);
           if (payload) {
