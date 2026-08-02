@@ -1,7 +1,7 @@
 [package]
 name = "peerce-gui"
-version = "0.1.0"
-description = "Tauri GUI for Peerce utility"
+version = "0.2.0-alpha.0"
+description = "Peerce GUI with Tauri"
 edition = "2021"
 
 [lib]
