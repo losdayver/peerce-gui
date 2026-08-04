@@ -1,0 +1,9 @@
+{
+  "bundle": {
+    "targets": ["appimage"],
+    "icon": ["icons/icon.png"],
+    "resources": {
+      "../dist/runtime/node": "node"
+    }
+  }
+}

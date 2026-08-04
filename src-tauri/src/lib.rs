@@ -11,6 +11,12 @@ use tauri::{Manager, RunEvent};
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 
+#[cfg(all(target_os = "windows", not(debug_assertions)))]
+const NODE_BINARY: &str = "node.exe";
+
+#[cfg(all(target_os = "linux", not(debug_assertions)))]
+const NODE_BINARY: &str = "node";
+
 #[allow(unused_variables)]
 pub fn run() {
     let backend: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
@@ -23,7 +29,7 @@ pub fn run() {
             #[cfg(not(debug_assertions))]
             {
                 let resource_dir = app.path().resource_dir()?;
-                let node = resource_dir.join("node.exe");
+                let node = resource_dir.join(NODE_BINARY);
                 let script = resource_dir.join("dist/backend/server.js");
 
                 // Node.js cannot use Windows extended-length paths (`\\?\C:\...`)
@@ -71,7 +77,7 @@ pub fn run() {
     });
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", not(debug_assertions)))]
 fn without_windows_extended_path_prefix(path: PathBuf) -> PathBuf {
     let path_string = path.to_string_lossy();
 
