@@ -10,11 +10,14 @@ import { WebSocketServer } from "ws";
 import { WssRouter } from "./wssRouter.js";
 import * as config from "./configProvider.js";
 import { init } from "./db/initAndMigrate.js";
+import { appHomeDir } from "./configProvider.js";
 config;
 
 init();
 
-const logStream = createWriteStream("backend.log", { flags: "a" });
+const logStream = createWriteStream(join(appHomeDir, "backend.log"), {
+  flags: "a",
+});
 process.stdout.write = logStream.write.bind(logStream);
 process.stderr.write = logStream.write.bind(logStream);
 
@@ -33,8 +36,9 @@ const server = createServer((request, response) => {
   const pathname = new URL(request.url ?? "/", `http://${host}:${port}`)
     .pathname;
 
+  allowFrontend(response);
+
   if (request.method === "OPTIONS") {
-    allowFrontend(response);
     response.writeHead(204);
     response.end();
     return;

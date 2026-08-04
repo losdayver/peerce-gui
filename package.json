@@ -1,12 +1,16 @@
 {
   "name": "peerce-gui",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-2",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "compile": "npm run compile:frontend && npm run compile:backend",
     "compile:frontend": "vite build && node scripts/copy-frontend.mjs",
     "compile:backend": "npx tsc -p backend/tsconfig.json",
+    "prepare:bundle": "node scripts/prepare-bundle.mjs",
     "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
     "watch:backend": "nodemon --watch backend --watch commonTypes --ext ts,js,json --exec \"npm run compile:backend && node dist/backend/server.js\"",
     "watch:dev": "node scripts/watch-dev.mjs",

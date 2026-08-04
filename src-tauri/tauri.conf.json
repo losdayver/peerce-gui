@@ -1,11 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Peerce GUI with Tauri",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-2",
   "identifier": "local.peerce-gui-tauri-nodejs",
   "build": {
     "beforeDevCommand": "npm run watch:dev",
-    "beforeBuildCommand": "npm run compile",
+    "beforeBuildCommand": "npm run compile && npm run prepare:bundle",
     "devUrl": "http://127.0.0.1:4310",
     "frontendDist": "../dist/frontend"
   },
@@ -20,16 +20,24 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src http://127.0.0.1:4310; style-src 'self'"
+      "csp": "default-src 'self'; connect-src http://127.0.0.1:4310 ws://127.0.0.1:4310; style-src 'self'"
     }
   },
   "bundle": {
     "active": true,
+    "targets": ["nsis"],
     "icon": ["icons/icon.ico"],
     "resources": {
-      "../dist/backend/server.js": "backend/server.js",
-      "../dist/backend/server.js.map": "backend/server.js.map",
-      "../backend/package.json": "backend/package.json"
+      "../dist/backend": "dist/backend",
+      "../package.json": "package.json",
+      "../node_modules": "node_modules",
+      "../dist/runtime/node.exe": "node.exe",
+      "../dist/runtime/node-LICENSE": "node-LICENSE"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "perMachine"
+      }
     }
   }
 }

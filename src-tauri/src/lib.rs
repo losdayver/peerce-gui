@@ -22,26 +22,35 @@ pub fn run() {
         .setup(move |app| {
             #[cfg(not(debug_assertions))]
             {
-                let script = app.path().resource_dir()?.join("backend/server.js");
+                let resource_dir = app.path().resource_dir()?;
+                let node = resource_dir.join("node.exe");
+                let script = resource_dir.join("dist/backend/server.js");
 
                 // Node.js cannot use Windows extended-length paths (`\\?\C:\...`)
-                // as an entrypoint, so pass it the equivalent regular drive path.
+                // as executable or entrypoint paths, so pass regular drive paths.
                 #[cfg(target_os = "windows")]
-                let script = PathBuf::from(
-                    script
-                        .to_string_lossy()
-                        .strip_prefix(r"\\?\")
-                        .unwrap_or(&script.to_string_lossy()),
-                );
+                let node = without_windows_extended_path_prefix(node);
 
-                let mut command = Command::new("node");
-                command.arg(script);
+                #[cfg(target_os = "windows")]
+                let script = without_windows_extended_path_prefix(script);
+
+                #[cfg(target_os = "windows")]
+                let resource_dir = without_windows_extended_path_prefix(resource_dir);
+
+                let mut command = Command::new(&node);
+                command
+                    .arg(&script)
+                    .current_dir(&resource_dir)
+                    .env("NODE_ENV", "production");
 
                 #[cfg(target_os = "windows")]
                 command.creation_flags(0x08000000);
 
                 let child = command.spawn().map_err(|error| {
-                    format!("Cannot start Node.js backend. Is Node.js installed? {error}")
+                    format!(
+                        "Cannot start bundled Node.js backend at {}: {error}",
+                        node.display()
+                    )
                 })?;
 
                 *backend_on_setup.lock().expect("backend lock is poisoned") = Some(child);
@@ -60,4 +69,15 @@ pub fn run() {
             }
         }
     });
+}
+
+#[cfg(target_os = "windows")]
+fn without_windows_extended_path_prefix(path: PathBuf) -> PathBuf {
+    let path_string = path.to_string_lossy();
+
+    PathBuf::from(
+        path_string
+            .strip_prefix(r"\\?\")
+            .unwrap_or(path_string.as_ref()),
+    )
 }
