@@ -25,18 +25,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
-    "icon": ["icons/icon.ico"],
     "resources": {
       "../dist/backend": "dist/backend",
       "../package.json": "package.json",
-      "../dist/runtime/node.exe": "node.exe",
       "../dist/runtime/node-LICENSE": "node-LICENSE"
-    },
-    "windows": {
-      "nsis": {
-        "installMode": "perMachine"
-      }
     }
   }
 }

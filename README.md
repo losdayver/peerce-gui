@@ -7,7 +7,7 @@
 Peerce GUI is a desktop interface for connecting peers and transferring files with [Peerce](https://www.npmjs.com/package/peerce). It provides peer management, connection status, transfer progress, and persistent transfer history in a native Tauri application.
 
 > [!WARNING]
-> **Peerce GUI is currently in active development.** Features and configuration may change, some functionality is incomplete, and the application is not yet recommended for production use.
+> **Peerce GUI is currently in active development.** Features and configuration may change; some functionality is incomplete, and the application is not yet recommended for production use.
 
 ## Preview
 
@@ -35,11 +35,19 @@ To start a local Peerce relay for development:
 npm run peerce-relay-local
 ```
 
-Create a production bundle with:
+## Build
+
+### Prerequisites
+
+- Node.js runtime version 22 (`>=22 <23`), available from the [official website](https://nodejs.org/en/download)
+
+If you are using nvm, make sure the correct version is selected, then run:
 
 ```bash
 npm run build
 ```
+
+After a successful build, `src-tauri/target/release/bundle` will contain the release artifacts for the target platform: an NSIS installer when building on Windows or an AppImage when building on Linux.
 
 ## License
 
