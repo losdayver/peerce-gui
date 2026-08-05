@@ -4,7 +4,9 @@ import { dirname, join } from "node:path";
 const requiredNodeMajor = 22;
 const currentNodeMajor = Number.parseInt(process.versions.node, 10);
 
-if (process.platform !== "win32" && process.platform !== "linux") {
+const supportedPlatforms = new Set(["win32", "linux", "darwin"]);
+
+if (!supportedPlatforms.has(process.platform)) {
   throw new Error(`Unsupported bundle platform: ${process.platform}.`);
 }
 
@@ -29,6 +31,6 @@ await Promise.all([
   copyFile(nodeLicensePath, join(runtimeDirectory, "node-LICENSE")),
 ]);
 
-if (process.platform === "linux") await chmod(bundledNodePath, 0o755);
+if (process.platform !== "win32") await chmod(bundledNodePath, 0o755);
 
 console.log(`Prepared bundled Node.js runtime ${process.versions.node}.`);
