@@ -39,6 +39,7 @@ npm run peerce-relay-local
 
 ### Prerequisites
 
+- Tauri prerequisites [official website](https://v2.tauri.app/start/prerequisites/)
 - Node.js runtime version 22 (`>=22 <23`), available from the [official website](https://nodejs.org/en/download)
 
 If you are using nvm, make sure the correct version is selected, then run:
