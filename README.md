@@ -47,7 +47,13 @@ If you are using nvm, make sure the correct version is selected, then run:
 npm run build
 ```
 
-After a successful build, `src-tauri/target/release/bundle` will contain the release artifacts for the target platform: an NSIS installer when building on Windows or an AppImage when building on Linux.
+After a successful build, `src-tauri/target/release/bundle` will contain the release artifacts for the host platform:
+
+- an NSIS installer on Windows;
+- an AppImage on Linux;
+- a DMG image on macOS.
+
+Build the macOS package on macOS with the native Node.js architecture (`arm64` on Apple Silicon or `x64` on Intel). The generated DMG is unsigned; distribution without a Gatekeeper warning requires Apple code signing and notarization.
 
 ## License
 

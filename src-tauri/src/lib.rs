@@ -14,7 +14,7 @@ use std::os::windows::process::CommandExt;
 #[cfg(all(target_os = "windows", not(debug_assertions)))]
 const NODE_BINARY: &str = "node.exe";
 
-#[cfg(all(target_os = "linux", not(debug_assertions)))]
+#[cfg(all(any(target_os = "linux", target_os = "macos"), not(debug_assertions)))]
 const NODE_BINARY: &str = "node";
 
 #[allow(unused_variables)]
