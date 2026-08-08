@@ -39,6 +39,7 @@ npm run peerce-relay-local
 
 ### Prerequisites
 
+- See limitations if building Appimage for linux [official website](https://v2.tauri.app/distribute/appimage/#limitations)
 - Tauri prerequisites [official website](https://v2.tauri.app/start/prerequisites/)
 - Node.js runtime version 22 (`>=22 <23`), available from the [official website](https://nodejs.org/en/download)
 
