@@ -1,6 +1,12 @@
 export interface FileHarborStateItem {
   tag: string;
+  selfTag: string;
+  selfAddr?: string;
+  selfPort?: number;
+  relayAddr: string;
+  relayPort: number;
   state: "offline" | "request sent" | "connected" | "connecting";
+  aggressive: boolean;
   incomingTransfers: FileHarborStateItemTransfer[];
   outgoingTransfers: FileHarborStateItemTransfer[];
 }

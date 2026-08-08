@@ -17,7 +17,8 @@ export type WSMessages =
   | WSAppGetConfigMessage
   | WSFHUnregisterPeerMessage
   | WSFHReconnectPeerMessage
-  | WSFileHarbourUIMessage;
+  | WSFileHarbourUIMessage
+  | WSFHEditPeerMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -41,6 +42,7 @@ export interface WSFHRegisterPeerMessage {
     distantTag: string;
     selfAddr?: string;
     selfPort?: number;
+    aggressive?: boolean;
   };
 }
 
@@ -62,6 +64,19 @@ export interface WSFHReconnectPeerMessage {
   type: "file-harbour-reconnect-peer";
   payload: {
     tag: string;
+  };
+}
+
+export interface WSFHEditPeerMessage {
+  type: "file-harbour-edit-peer";
+  payload: {
+    selfTag: string;
+    distantTag: string;
+    relayAddr: string;
+    relayPort: number;
+    selfAddr?: string;
+    selfPort?: number;
+    aggressive?: boolean;
   };
 }
 

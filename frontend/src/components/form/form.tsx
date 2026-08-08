@@ -15,6 +15,7 @@ export type ItemDescriptor = (
   validator?: (value: any) => Omit<FormItemNotify, "fld"> | void;
   required?: boolean;
   divideAfter?: boolean;
+  hint?: string;
 };
 
 interface InputItemDescriptor extends InputProps {
@@ -97,6 +98,8 @@ export const Form = <Schema extends FormSchema>({
             key={fldKey}
             divideAfter={descriptor.divideAfter}
             notify={error}
+            hint={descriptor.hint}
+            disabled={descriptor.disabled}
           >
             {componentFactory(descriptor, formData[fldKey], (val: any) =>
               setFormData((prev) =>

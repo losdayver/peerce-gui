@@ -63,6 +63,8 @@ export class WssRouter {
       this.fileHarbour.unregisterPeer(message.payload.tag),
     "file-harbour-reconnect-peer": (_, message) =>
       this.fileHarbour.reconnectPeer(message.payload.tag),
+    "file-harbour-edit-peer": (_, message) =>
+      this.fileHarbour.registerPeer(message.payload, false, true),
     "file-harbour-add-transfer": (_, message) =>
       this.fileHarbour.addTransfer(
         message.payload.tag,

@@ -16,14 +16,15 @@ export const insertNewConnection = (connection: FHConnectionTable) => {
   db.prepare(
     `
     insert into fh_connection 
-    (distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port) 
-    values (?, ?, ?, ?, ?, ?)
+    (distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive)
+    values (?, ?, ?, ?, ?, ?, ?)
     on conflict(distant_tag) do update set
       self_tag = excluded.self_tag,
       self_addr = excluded.self_addr,
       self_port = excluded.self_port,
       relay_addr = excluded.relay_addr,
-      relay_port = excluded.relay_port
+      relay_port = excluded.relay_port,
+      aggressive = excluded.aggressive
     `
   ).run(
     c.distant_tag,
@@ -31,7 +32,8 @@ export const insertNewConnection = (connection: FHConnectionTable) => {
     c.self_addr,
     c.self_port,
     c.relay_addr,
-    c.relay_port
+    c.relay_port,
+    c.aggressive
   );
 };
 
@@ -65,7 +67,7 @@ export const insertNewConnectionTransfer = (
 
 export const getAllConnections = (): FHConnectionTable[] =>
   selectAll<FHConnectionTable>(`
-    select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port
+    select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive
     from fh_connection
   `);
 
@@ -74,7 +76,7 @@ export const getConnectionsByDistantTag = (
 ): FHConnectionTable | undefined =>
   selectAll<FHConnectionTable>(
     `
-      select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port
+      select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive
       from fh_connection
       where distant_tag = ?
     `,
