@@ -22,6 +22,8 @@ import { FHConnectionTransferTableState } from "./db/initAndMigrate.js";
 import type { FHConnectionTransferTable } from "./db/initAndMigrate.js";
 import { setTimeout as sleep } from "node:timers/promises";
 
+const RELAY_REQUEST_TIMEOUT_MS = 40_000;
+
 export class FileHarbor {
   constructor(
     private sendUpdateMessage: (state: FileHarborState) => void,
@@ -212,7 +214,8 @@ class LivePeerConnection {
   selfPort?: number;
   relayAddr: string;
   relayPort: number;
-  aggressive = false;
+  aggressive: boolean;
+  private relayRequestTimeout?: NodeJS.Timeout;
 
   constructor(
     private fileHarbour: FileHarbor,
@@ -224,7 +227,7 @@ class LivePeerConnection {
     this.selfTag = payload.selfTag;
     this.selfAddr = payload.selfAddr;
     this.selfPort = payload.selfPort;
-    this.aggressive ||= !!payload.aggressive;
+    this.aggressive = !!payload.aggressive;
     this.relayAddr = payload.relayAddr;
     this.relayPort = payload.relayPort;
     this.peer.on("onFullMessage", this.onFullMessage);
@@ -240,10 +243,13 @@ class LivePeerConnection {
       "onOutgoingTransmissionPercentageChange",
       this.onOutgoingTransmissionPercentageChange
     );
+    this.peer.once("onConnectedToRelay", this.startRelayRequestTimeout);
     this.peer.on("onConnectedToPeer", () => {
+      this.clearRelayRequestTimeout();
       this.fileHarbour.sendUIMessage(`🔌 Connected to "${this.distantTag}"`);
     });
     this.peer.on("onClosing", (reason) => {
+      this.clearRelayRequestTimeout();
       if (reason == "RELAY_CLOSE") {
         if (this.aggressive)
           sleep(2000).then(() =>
@@ -257,6 +263,28 @@ class LivePeerConnection {
     });
     if (!doNotConnect) void this.peer.requestSessionViaRelayAsync();
   }
+
+  private startRelayRequestTimeout = (): void => {
+    this.relayRequestTimeout = setTimeout(() => {
+      this.relayRequestTimeout = undefined;
+      if (this.peer.stateMachine.getCurrentState() !== "connectingToPeer") {
+        return;
+      }
+
+      void this.peer.close("RELAY_CLOSE").catch((error: unknown) => {
+        console.error(
+          `Failed to close timed-out relay request for "${this.distantTag}"`,
+          error
+        );
+      });
+    }, RELAY_REQUEST_TIMEOUT_MS);
+    this.relayRequestTimeout.unref();
+  };
+
+  private clearRelayRequestTimeout = (): void => {
+    clearTimeout(this.relayRequestTimeout);
+    this.relayRequestTimeout = undefined;
+  };
 
   onIncomingTransmissionStart = (fileName: string) => {
     this.incomingTransfers.set(fileName, { fileName, progress: 0 });
@@ -337,6 +365,7 @@ class LivePeerConnection {
   disconnect = (): Promise<void> => this.peer.close();
 
   clearListeners = (): void => {
+    this.clearRelayRequestTimeout();
     this.peer.removeAllListeners();
   };
 
