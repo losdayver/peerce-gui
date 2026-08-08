@@ -38,12 +38,6 @@ export interface FileHarbourContextValue {
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);
 
-function isFileHarbourState(
-  message: WSGenericMessage
-): message is WSFileHarbourState {
-  return message.type === "file-harbour-state";
-}
-
 export function FileHarbourProvider({ children }: PropsWithChildren) {
   const [state, setState] = useState<FileHarborState>({ items: [] });
   const [activePeerTag, setActivePeerTag] = useState<string | null>(null);

@@ -18,23 +18,9 @@ import {
   insertNewConnection,
   insertNewConnectionTransfer,
 } from "./db/provider.js";
-import {
-  FHConnectionTransferTableIncoming,
-  FHConnectionTransferTableState,
-} from "./db/initAndMigrate.js";
+import { FHConnectionTransferTableState } from "./db/initAndMigrate.js";
 import type { FHConnectionTransferTable } from "./db/initAndMigrate.js";
-
-interface PeerConnection {
-  getState: () => FileHarborStateItem["state"];
-  getTransfers: () => Pick<
-    FileHarborStateItem,
-    "incomingTransfers" | "outgoingTransfers"
-  >;
-  disconnect: () => Promise<void>;
-  clearListeners: () => void;
-  restoreTransfer: (transfer: FHConnectionTransferTable) => void;
-  addTransfer: (fullFilePath: string) => void;
-}
+import { setTimeout as sleep } from "node:timers/promises";
 
 export class FileHarbor {
   constructor(
@@ -50,6 +36,7 @@ export class FileHarbor {
         self_addr,
         self_port,
         self_tag,
+        aggressive,
       }) =>
         this.registerPeer(
           {
@@ -59,6 +46,7 @@ export class FileHarbor {
             selfAddr: self_addr ?? undefined,
             selfPort: self_port ?? undefined,
             selfTag: self_tag,
+            aggressive: !!aggressive,
           },
           true
         )
@@ -75,7 +63,7 @@ export class FileHarbor {
     }, 500);
   }
 
-  peerConnectionMap = new Map<string, PeerConnection>();
+  peerConnectionMap = new Map<string, LivePeerConnection>();
   private reconnectingPeerTags = new Set<string>();
 
   private notifyState = (): void => {
@@ -86,13 +74,23 @@ export class FileHarbor {
     payload: WSFHRegisterPeerMessage["payload"],
     doNotInsert = false
   ) => {
-    // todo check if exists
+    const { distantTag, relayAddr, relayPort, selfTag, selfAddr, selfPort } =
+      payload;
+
+    const liveConn = this.peerConnectionMap.get(distantTag);
+    if (
+      liveConn?.distantTag == distantTag &&
+      liveConn?.relayAddr == relayAddr &&
+      liveConn?.relayPort == relayPort
+    ) {
+      this.sendUIMessage("🚨 Peer already registered");
+      return;
+    }
 
     const connection = new LivePeerConnection(this, payload);
     this.peerConnectionMap.set(payload.distantTag, connection);
-    const { distantTag, relayAddr, relayPort, selfTag, selfAddr, selfPort } =
-      payload;
-    if (!doNotInsert)
+    if (!doNotInsert) {
+      console.log(payload);
       insertNewConnection({
         distant_tag: distantTag,
         self_tag: selfTag,
@@ -100,7 +98,9 @@ export class FileHarbor {
         relay_port: relayPort,
         self_addr: selfAddr ?? null,
         self_port: selfPort ?? null,
+        aggressive: payload.aggressive ? 1 : 0,
       });
+    }
     this.notifyState();
   };
   unregisterPeer = (tag: string): void => {
@@ -139,6 +139,7 @@ export class FileHarbor {
         self_addr,
         self_port,
         self_tag,
+        aggressive,
       } = dbConnection;
 
       const connection = new LivePeerConnection(this, {
@@ -148,6 +149,7 @@ export class FileHarbor {
         selfTag: self_tag,
         selfAddr: self_addr ?? undefined,
         selfPort: self_port ?? undefined,
+        aggressive: !!aggressive,
       });
 
       transfers.forEach((transfer) => connection.restoreTransfer(transfer));
@@ -164,7 +166,7 @@ export class FileHarbor {
     insertNewConnectionTransfer({
       distant_tag: tag,
       file_name: basename(fullFilePath),
-      incoming: FHConnectionTransferTableIncoming.FALSE,
+      incoming: 0,
     });
     this.notifyState();
   };
@@ -173,6 +175,7 @@ export class FileHarbor {
       this.peerConnectionMap.entries(),
       ([tag, peerConn]) => ({
         tag,
+        aggressive: peerConn.aggressive,
         state: peerConn.getState(),
         ...peerConn.getTransfers(),
       })
@@ -181,7 +184,7 @@ export class FileHarbor {
   };
 }
 
-class LivePeerConnection implements PeerConnection {
+class LivePeerConnection {
   peer: SimplePeer;
   private incomingTransfers = new Map<
     string,
@@ -191,7 +194,10 @@ class LivePeerConnection implements PeerConnection {
     string,
     { fileName: string; progress: number }
   >();
-  private distantTag: string;
+  distantTag: string;
+  relayAddr: string;
+  relayPort: number;
+  aggressive = false;
 
   constructor(
     private fileHarbour: FileHarbor,
@@ -199,6 +205,9 @@ class LivePeerConnection implements PeerConnection {
   ) {
     this.peer = new SimplePeer(payload);
     this.distantTag = payload.distantTag;
+    this.aggressive ||= !!payload.aggressive;
+    this.relayAddr = payload.relayAddr;
+    this.relayPort = payload.relayPort;
     this.peer.on("onFullMessage", this.onFullMessage);
     this.peer.on(
       "onIncomingTransmissionStart",
@@ -215,7 +224,14 @@ class LivePeerConnection implements PeerConnection {
     this.peer.on("onConnectedToPeer", () => {
       this.fileHarbour.sendUIMessage(`🔌 Connected to "${this.distantTag}"`);
     });
-    this.peer.on("onClosing", () => {
+    this.peer.on("onClosing", (reason) => {
+      if (reason == "RELAY_CLOSE") {
+        if (this.aggressive)
+          sleep(2000).then(() =>
+            this.fileHarbour.reconnectPeer(this.distantTag)
+          );
+        return;
+      }
       this.fileHarbour.sendUIMessage(
         `🔌 Disconnected from "${this.distantTag}"`
       );
@@ -228,7 +244,7 @@ class LivePeerConnection implements PeerConnection {
     insertNewConnectionTransfer({
       distant_tag: this.distantTag,
       file_name: basename(fileName),
-      incoming: FHConnectionTransferTableIncoming.TRUE,
+      incoming: 1,
     });
     this.fileHarbour.sendUIMessage(
       `📩 New incoming transmission from ${this.distantTag}, sending "${fileName}"`
@@ -246,7 +262,7 @@ class LivePeerConnection implements PeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: FHConnectionTransferTableIncoming.TRUE,
+        incoming: 0,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };
@@ -262,7 +278,7 @@ class LivePeerConnection implements PeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: FHConnectionTransferTableIncoming.FALSE,
+        incoming: 1,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };
@@ -312,7 +328,7 @@ class LivePeerConnection implements PeerConnection {
         transfer.state === FHConnectionTransferTableState.COMPLETED ? 1 : 0,
     };
 
-    if (transfer.incoming === FHConnectionTransferTableIncoming.TRUE) {
+    if (transfer.incoming === 1) {
       this.incomingTransfers.set(transfer.file_name, restoredTransfer);
     } else {
       this.outgoingTransfers.set(transfer.file_name, restoredTransfer);

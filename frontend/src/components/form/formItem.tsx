@@ -9,6 +9,7 @@ export interface FormItemProps {
   key?: string;
   divideAfter?: boolean;
   notify?: FormItemNotify;
+  hint?: string;
 }
 
 export interface FormItemNotify<Keys extends string = string> {
@@ -24,11 +25,25 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
   key,
   divideAfter,
   notify,
+  hint,
 }) => {
   return (
     <div className={`form__item ${notify ? notify.severity : ""}`} key={key}>
       <span className="form__label">
-        {title}:
+        {title}
+        {hint ? (
+          <span
+            className="form__hint"
+            data-hint={hint}
+            aria-label={`Подсказка: ${hint}`}
+            tabIndex={0}
+          >
+            ❔
+          </span>
+        ) : (
+          ""
+        )}
+        :
         {required && (
           <span className="form__required" aria-hidden="true">
             *

@@ -1,6 +1,7 @@
 export interface FileHarborStateItem {
   tag: string;
   state: "offline" | "request sent" | "connected" | "connecting";
+  aggressive: boolean;
   incomingTransfers: FileHarborStateItemTransfer[];
   outgoingTransfers: FileHarborStateItemTransfer[];
 }

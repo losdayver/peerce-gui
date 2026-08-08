@@ -1,5 +1,37 @@
 import { db } from "./provider.js";
 
+const SQLITE_IDENTIFIER_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+const quoteIdentifier = (identifier: string): string => {
+  if (!SQLITE_IDENTIFIER_PATTERN.test(identifier)) {
+    throw new TypeError(`Invalid SQLite identifier: ${identifier}`);
+  }
+
+  return `"${identifier}"`;
+};
+
+export const addColumnIfNotExists = (
+  tableName: string,
+  columnName: string,
+  definitionSql: string
+): boolean => {
+  const columnExists = db
+    .prepare("select 1 from pragma_table_info(?) where name = ? limit 1")
+    .get(tableName, columnName);
+
+  if (columnExists) return false;
+
+  db.exec(
+    `alter table ${quoteIdentifier(tableName)} add column ${quoteIdentifier(columnName)} ${definitionSql};`
+  );
+  return true;
+};
+
+export const enum FHConnectionTransferTableState {
+  COMPLETED = 1,
+  INTERRUPTED = 2,
+}
+
 export interface FHConnectionTable {
   distant_tag: string;
   self_tag: string;
@@ -7,22 +39,13 @@ export interface FHConnectionTable {
   self_port: number | null;
   relay_addr: string;
   relay_port: number;
-}
-
-export const enum FHConnectionTransferTableIncoming {
-  FALSE = 0,
-  TRUE = 1,
-}
-
-export const enum FHConnectionTransferTableState {
-  COMPLETED = 1,
-  INTERRUPTED = 2,
+  aggressive: 1 | 0;
 }
 
 export interface FHConnectionTransferTable {
   distant_tag: string;
   file_name: string;
-  incoming: FHConnectionTransferTableIncoming;
+  incoming: 1 | 0;
   state: FHConnectionTransferTableState;
 }
 
@@ -51,4 +74,12 @@ export const init = () => {
     create unique index if not exists ux_fh_conn_transfer_identity
       on fh_connection_transfer(distant_tag, file_name, incoming);
     `);
+};
+
+export const migrate = () => {
+  addColumnIfNotExists(
+    "fh_connection",
+    "aggressive",
+    "integer not null default 0"
+  );
 };

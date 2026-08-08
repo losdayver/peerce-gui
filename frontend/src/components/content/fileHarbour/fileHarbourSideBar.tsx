@@ -1,6 +1,4 @@
-import {
-  FileHarbourSidebarItem,
-} from "./fileHarbourSidebarItem";
+import { FileHarbourSidebarItem } from "./fileHarbourSidebarItem";
 import { useFileHarbour } from "./fileHarbourContext";
 
 export const FileHarbourSidebar: React.FC = () => {
@@ -15,6 +13,7 @@ export const FileHarbourSidebar: React.FC = () => {
             <FileHarbourSidebarItem
               {...peer}
               active={peer.tag === activePeerTag}
+              aggressive={peer.aggressive}
               key={peer.tag}
               onClick={() => setActivePeerTag(peer.tag)}
             />

@@ -41,6 +41,7 @@ export interface WSFHRegisterPeerMessage {
     distantTag: string;
     selfAddr?: string;
     selfPort?: number;
+    aggressive?: boolean;
   };
 }
 

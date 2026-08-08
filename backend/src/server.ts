@@ -9,11 +9,12 @@ import { extname, join, resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { WssRouter } from "./wssRouter.js";
 import * as config from "./configProvider.js";
-import { init } from "./db/initAndMigrate.js";
+import { init, migrate } from "./db/initAndMigrate.js";
 import { appHomeDir } from "./configProvider.js";
 config;
 
 init();
+migrate();
 
 const logStream = createWriteStream(join(appHomeDir, "backend.log"), {
   flags: "a",

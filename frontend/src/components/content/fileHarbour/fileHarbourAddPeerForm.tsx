@@ -25,23 +25,30 @@ const formSchema = {
     validator: tagFormValidator,
   },
   distantTag: {
-    title: "Peer tag",
+    title: "Distant tag",
     component: "input",
-    divideAfter: true,
     required: true,
     validator: tagFormValidator,
+  },
+  aggressive: {
+    title: "Aggressive mode",
+    component: "checkbox",
+    divideAfter: true,
+    hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
     title: "Self address",
     component: "input",
     placeholder: "XXX.XXX.XXX.XXX",
     validator: addressFormValidator,
+    hint: "If you want to bind your udp socket to a specific address",
   },
   selfPort: {
     title: "Self port",
     component: "inputNum",
     divideAfter: true,
     validator: portFormValidator,
+    hint: "If you want to bind your udp socket to a specific port",
   },
   relayAddr: {
     title: "Relay address",
@@ -71,6 +78,7 @@ function toRegisterPeerPayload(
     selfAddr: data.selfAddr,
     relayAddr: data.relayAddr,
     relayPort: data.relayPort,
+    aggressive: data.aggressive,
   };
 }
 

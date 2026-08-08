@@ -60,8 +60,10 @@
 
 .file-harbour__peer {
   position: relative;
+  isolation: isolate;
   width: 100%;
   min-height: 68px;
+  overflow: hidden;
   padding: 10px 12px;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
@@ -110,11 +112,67 @@
     0 12px 26px rgba(0, 0, 0, 0.16);
 }
 
+.file-harbour__peer--aggressive {
+  border-color: rgba(255, 139, 72, 0.32);
+  background:
+    radial-gradient(
+      circle at 16% 115%,
+      rgba(255, 185, 82, 0.15),
+      transparent 42%
+    ),
+    linear-gradient(
+      115deg,
+      rgba(53, 31, 25, 0.94),
+      rgba(125, 54, 25, 0.28),
+      rgba(210, 105, 32, 0.11),
+      rgba(48, 29, 26, 0.94)
+    );
+  background-size: 100% 100%, 220% 100%;
+  box-shadow:
+    inset 0 0 14px rgba(255, 113, 37, 0.07),
+    0 0 5px rgba(255, 95, 30, 0.18),
+    0 0 14px rgba(255, 137, 50, 0.08);
+  animation: file-harbour-peer-burn 4.8s ease-in-out infinite;
+}
+
+.file-harbour__peer--aggressive::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -65%;
+  z-index: 0;
+  width: 52%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255, 109, 28, 0.03),
+    rgba(255, 230, 158, 0.12),
+    rgba(255, 87, 20, 0.03),
+    transparent
+  );
+  content: "";
+  pointer-events: none;
+  transform: skewX(-12deg);
+  animation: file-harbour-peer-sheen 5.5s linear infinite;
+}
+
+.file-harbour__peer--aggressive.file-harbour__peer--active {
+  border-color: rgba(255, 174, 82, 0.52);
+  box-shadow:
+    inset 3px 0 0 rgba(255, 213, 126, 0.7),
+    inset 0 0 16px rgba(255, 107, 31, 0.09),
+    0 0 7px rgba(255, 91, 28, 0.24),
+    0 0 17px rgba(255, 137, 50, 0.1);
+}
+
 .file-harbour__peer:active {
   transform: translateX(1px) scale(0.99);
 }
 
 .file-harbour__peer-icon {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
   width: 42px;
   height: 42px;
   display: grid;
@@ -131,13 +189,125 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
+.file-harbour__peer-initials {
+  position: relative;
+  z-index: 1;
+}
+
+.file-harbour__peer--aggressive .file-harbour__peer-icon,
+.file-harbour__workspace-avatar.file-harbour__workspace-avatar--aggressive {
+  border-color: rgba(255, 199, 107, 0.4);
+  background:
+    radial-gradient(
+      circle at 50% 90%,
+      rgba(255, 196, 79, 0.74) 0%,
+      rgba(231, 88, 28, 0.64) 34%,
+      transparent 66%
+    ),
+    linear-gradient(145deg, #57251c, #9f3e1e 58%, #3e211f);
+  background-size: 130% 160%, 100% 100%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 202, 0.24),
+    inset 0 -8px 15px rgba(112, 29, 15, 0.22),
+    0 0 6px rgba(255, 103, 31, 0.36),
+    0 0 13px rgba(255, 153, 53, 0.16);
+  animation: file-harbour-icon-flame 2.4s ease-in-out infinite alternate;
+}
+
+.file-harbour__peer--aggressive .file-harbour__peer-initials,
+.file-harbour__workspace-avatar--aggressive
+  .file-harbour__workspace-avatar-initials {
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    #fff0c3,
+    #ffc36b,
+    #ef8450,
+    #ffe5a8,
+    #ffb25d
+  );
+  background-size: 240% 100%;
+  background-clip: text;
+  filter: drop-shadow(0 0 3px rgba(255, 214, 125, 0.32));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: file-harbour-initials-fire 3.4s linear infinite;
+}
+
 .file-harbour__peer-meta {
+  position: relative;
+  z-index: 1;
   min-width: 0;
   min-height: 44px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 7px;
+}
+
+@keyframes file-harbour-peer-burn {
+  0%,
+  100% {
+    background-position: 0 0, 0% 50%;
+    box-shadow:
+      inset 0 0 13px rgba(255, 105, 31, 0.06),
+      0 0 4px rgba(255, 88, 27, 0.16),
+      0 0 12px rgba(255, 137, 50, 0.07);
+  }
+
+  50% {
+    background-position: 0 0, 100% 50%;
+    box-shadow:
+      inset 0 0 17px rgba(255, 129, 39, 0.1),
+      0 0 7px rgba(255, 88, 27, 0.24),
+      0 0 17px rgba(255, 148, 55, 0.11);
+  }
+}
+
+@keyframes file-harbour-peer-sheen {
+  to {
+    transform: translateX(330%) skewX(-12deg);
+  }
+}
+
+@keyframes file-harbour-icon-flame {
+  from {
+    background-position: 50% 32%, 0 0;
+  }
+
+  to {
+    background-position: 50% 66%, 0 0;
+  }
+}
+
+@keyframes file-harbour-initials-fire {
+  to {
+    background-position: -240% 0;
+  }
+}
+
+.file-harbour__peer--aggressive[data-state="offline"],
+.file-harbour__peer--aggressive[data-state="offline"]::after,
+.file-harbour__peer--aggressive[data-state="offline"]
+  .file-harbour__peer-icon,
+.file-harbour__peer--aggressive[data-state="offline"]
+  .file-harbour__peer-initials,
+.file-harbour__workspace-avatar--aggressive[data-state="offline"],
+.file-harbour__workspace-avatar--aggressive[data-state="offline"]
+  .file-harbour__workspace-avatar-initials {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .file-harbour__peer--aggressive,
+  .file-harbour__peer--aggressive::after,
+  .file-harbour__peer--aggressive .file-harbour__peer-icon,
+  .file-harbour__peer--aggressive .file-harbour__peer-initials,
+  .file-harbour__workspace-avatar--aggressive,
+  .file-harbour__workspace-avatar--aggressive
+    .file-harbour__workspace-avatar-initials {
+    animation: none;
+  }
 }
 
 .file-harbour__peer-name {
@@ -215,6 +385,8 @@
 }
 
 .file-harbour__workspace-avatar {
+  position: relative;
+  isolation: isolate;
   width: 50px;
   height: 50px;
   display: grid;
@@ -226,6 +398,11 @@
   font-size: 17px;
   font-weight: 800;
   background: rgba(118, 228, 180, 0.1);
+}
+
+.file-harbour__workspace-avatar-initials {
+  position: relative;
+  z-index: 1;
 }
 
 .file-harbour__workspace-status {

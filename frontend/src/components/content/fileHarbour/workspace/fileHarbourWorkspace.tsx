@@ -107,8 +107,14 @@ export const FileHarbourWorkspace: React.FC = () => {
   return (
     <section className="file-harbour__workspace">
       <header className="file-harbour__workspace-peer">
-        <span className="file-harbour__workspace-avatar" aria-hidden="true">
-          {getInitials(activePeer.tag)}
+        <span
+          className={`file-harbour__workspace-avatar${activePeer.aggressive ? " file-harbour__workspace-avatar--aggressive" : ""}`}
+          data-state={activePeer.state}
+          aria-hidden="true"
+        >
+          <span className="file-harbour__workspace-avatar-initials">
+            {getInitials(activePeer.tag)}
+          </span>
         </span>
         <div>
           <h2>{activePeer.tag}</h2>
