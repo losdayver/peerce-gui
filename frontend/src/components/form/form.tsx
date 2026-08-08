@@ -99,6 +99,7 @@ export const Form = <Schema extends FormSchema>({
             divideAfter={descriptor.divideAfter}
             notify={error}
             hint={descriptor.hint}
+            disabled={descriptor.disabled}
           >
             {componentFactory(descriptor, formData[fldKey], (val: any) =>
               setFormData((prev) =>

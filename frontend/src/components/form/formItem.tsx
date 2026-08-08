@@ -10,6 +10,7 @@ export interface FormItemProps {
   divideAfter?: boolean;
   notify?: FormItemNotify;
   hint?: string;
+  disabled?: boolean;
 }
 
 export interface FormItemNotify<Keys extends string = string> {
@@ -26,9 +27,13 @@ export const FormItem: React.FC<React.PropsWithChildren<FormItemProps>> = ({
   divideAfter,
   notify,
   hint,
+  disabled,
 }) => {
   return (
-    <div className={`form__item ${notify ? notify.severity : ""}`} key={key}>
+    <div
+      className={`form__item${notify ? ` ${notify.severity}` : ""}${disabled ? " disabled" : ""}`}
+      key={key}
+    >
       <span className="form__label">
         {title}
         {hint ? (
@@ -97,7 +102,7 @@ export const componentFactory = (
       return (
         <Checkbox
           {...descriptor}
-          value={value}
+          checked={Boolean(value)}
           onChange={(event) => onChange(event.target.checked)}
         />
       );

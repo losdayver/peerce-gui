@@ -9,9 +9,8 @@ import {
 } from "react";
 import type { FileHarborState } from "@commonTypes/fileHarbour.js";
 import type {
-  WSFileHarbourState,
-  WSGenericMessage,
   WSFHAddTransferMessage,
+  WSFHEditPeerMessage,
   WSFHRegisterPeerMessage,
   WSMessages,
 } from "@commonTypes/wsMessage.js";
@@ -19,11 +18,62 @@ import { wsClientContext } from "@interop/wsClient";
 import { Modal } from "@modal/modal";
 import { Form, type FormSchema } from "@form/form";
 import { showToastMessage } from "@components/toast/toast";
+import {
+  addressFormValidator,
+  portFormValidator,
+  tagFormValidator,
+} from "./commonFormValidators";
 
 const transferFormSchema = {
   fullFilePath: { component: "file", title: "File", required: true },
 } as const satisfies FormSchema;
 
+const editPeerFormSchema = {
+  selfTag: {
+    component: "input",
+    title: "Self tag",
+    required: true,
+    validator: tagFormValidator,
+    disabled: true,
+  },
+  distantTag: {
+    component: "input",
+    title: "Distant tag",
+    required: true,
+    validator: tagFormValidator,
+    disabled: true,
+  },
+  aggressive: {
+    component: "checkbox",
+    title: "Aggressive mode",
+    divideAfter: true,
+  },
+  selfAddr: {
+    component: "input",
+    title: "Self address",
+    validator: addressFormValidator,
+  },
+  selfPort: {
+    component: "inputNum",
+    title: "Self port",
+    divideAfter: true,
+    validator: portFormValidator,
+  },
+  relayAddr: {
+    component: "input",
+    title: "Relay address",
+    required: true,
+    validator: addressFormValidator,
+  },
+  relayPort: {
+    component: "inputNum",
+    title: "Relay port",
+    required: true,
+    validator: portFormValidator,
+  },
+} as const satisfies FormSchema;
+
+// todo tag is not enough
 export interface FileHarbourContextValue {
   state: FileHarborState;
   activePeerTag: string | null;
@@ -32,6 +82,7 @@ export interface FileHarbourContextValue {
   disconnectPeer: (tag: string) => void;
   unregisterPeer: (tag: string) => void;
   reconnectPeer: (tag: string) => void;
+  editPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
   openPeerFileDir: (tag: string) => Promise<void>;
 }
@@ -43,6 +94,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
   const [activePeerTag, setActivePeerTag] = useState<string | null>(null);
   const wsClient = useContext(wsClientContext).current;
   const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [editingPeerTag, setEditingPeerTag] = useState<string | null>(null);
 
   useEffect(() => {
     if (!wsClient) return;
@@ -94,6 +146,10 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     });
   };
 
+  const editPeer = (tag: string): void => {
+    setEditingPeerTag(tag);
+  };
+
   const addTransfer = (tag: string): void => {
     setTransferModalOpen(true);
   };
@@ -101,6 +157,8 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
   const closeTransferModal = (): void => {
     setTransferModalOpen(false);
   };
+
+  const editingPeer = state.items.find((peer) => peer.tag === editingPeerTag);
 
   const openPeerFileDir = async (tag: string) => {
     try {
@@ -130,10 +188,43 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         disconnectPeer,
         unregisterPeer,
         reconnectPeer,
+        editPeer,
         addTransfer,
         openPeerFileDir,
       }}
     >
+      <Modal
+        onClose={() => setEditingPeerTag(null)}
+        open={editingPeerTag !== null}
+        title="Edit peer"
+      >
+        <Form
+          schema={editPeerFormSchema}
+          initialData={{
+            selfTag: editingPeer?.selfTag ?? "",
+            distantTag: editingPeer?.tag ?? "",
+            aggressive: editingPeer?.aggressive ?? false,
+            selfAddr: editingPeer?.selfAddr,
+            selfPort: editingPeer?.selfPort,
+            relayAddr: editingPeer?.relayAddr ?? "",
+            relayPort: editingPeer?.relayPort,
+          }}
+          onConfirm={(data) => {
+            if (!editingPeerTag) return;
+
+            const message: WSFHEditPeerMessage = {
+              type: "file-harbour-edit-peer",
+              payload: {
+                ...data,
+                distantTag: editingPeerTag,
+                aggressive: data.aggressive ?? false,
+              },
+            };
+            wsClient?.sendMessage(message);
+            setEditingPeerTag(null);
+          }}
+        />
+      </Modal>
       <Modal
         onClose={closeTransferModal}
         open={transferModalOpen}

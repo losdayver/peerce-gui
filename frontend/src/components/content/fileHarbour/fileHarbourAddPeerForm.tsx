@@ -23,6 +23,7 @@ const formSchema = {
     component: "input",
     required: true,
     validator: tagFormValidator,
+    disabled: true,
   },
   distantTag: {
     title: "Distant tag",

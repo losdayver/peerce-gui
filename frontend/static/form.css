@@ -45,6 +45,19 @@
     0 0 0 4px rgba(242, 198, 109, 0.16);
 }
 
+.form__item.disabled .form__label {
+  color: rgba(232, 238, 247, 0.38);
+}
+
+.form__item.disabled .form__control {
+  opacity: 0.48;
+  filter: grayscale(0.45);
+}
+
+.form__item.disabled .form__control :is(input, button) {
+  cursor: not-allowed;
+}
+
 .form__label {
   justify-self: end;
   color: rgba(232, 238, 247, 0.72);

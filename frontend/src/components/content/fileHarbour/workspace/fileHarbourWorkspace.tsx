@@ -93,6 +93,7 @@ export const FileHarbourWorkspace: React.FC = () => {
     reconnectPeer,
     addTransfer,
     openPeerFileDir,
+    editPeer
   } = useFileHarbour();
   const activePeer = state.items.find((peer) => peer.tag === activePeerTag);
 
@@ -149,6 +150,9 @@ export const FileHarbourWorkspace: React.FC = () => {
         </Button>
         <Button onClick={() => openPeerFileDir(activePeer.tag)}>
           📂 Open folder
+        </Button>
+        <Button disabled={activePeer.state != "offline"} onClick={() => editPeer(activePeer.tag)}>
+          ✏️ Edit
         </Button>
       </div>
 

@@ -72,13 +72,15 @@ export class FileHarbor {
 
   registerPeer = (
     payload: WSFHRegisterPeerMessage["payload"],
-    doNotInsert = false
+    doNotInsert = false,
+    isUpdate = false
   ) => {
     const { distantTag, relayAddr, relayPort, selfTag, selfAddr, selfPort } =
       payload;
 
     const liveConn = this.peerConnectionMap.get(distantTag);
     if (
+      !isUpdate &&
       liveConn?.distantTag == distantTag &&
       liveConn?.relayAddr == relayAddr &&
       liveConn?.relayPort == relayPort
@@ -87,7 +89,7 @@ export class FileHarbor {
       return;
     }
 
-    const connection = new LivePeerConnection(this, payload);
+    const connection = new LivePeerConnection(this, payload, isUpdate);
     this.peerConnectionMap.set(payload.distantTag, connection);
     if (!doNotInsert) {
       console.log(payload);
@@ -103,6 +105,7 @@ export class FileHarbor {
     }
     this.notifyState();
   };
+
   unregisterPeer = (tag: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
@@ -111,12 +114,14 @@ export class FileHarbor {
     deleteConnection(tag);
     this.notifyState();
   };
+
   disconnectPeer = (tag: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
     peerConn.disconnect();
     this.notifyState();
   };
+
   reconnectPeer = async (tag: string): Promise<void> => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn || this.reconnectingPeerTags.has(tag)) return;
@@ -159,6 +164,7 @@ export class FileHarbor {
       this.reconnectingPeerTags.delete(tag);
     }
   };
+
   addTransfer = (tag: string, fullFilePath: string): void => {
     const peerConn = this.peerConnectionMap.get(tag);
     if (!peerConn) return;
@@ -170,11 +176,17 @@ export class FileHarbor {
     });
     this.notifyState();
   };
+
   getConstructedState = (): FileHarborState => {
     const items: FileHarborStateItem[] = Array.from(
       this.peerConnectionMap.entries(),
       ([tag, peerConn]) => ({
         tag,
+        selfTag: peerConn.selfTag,
+        selfAddr: peerConn.selfAddr,
+        selfPort: peerConn.selfPort,
+        relayAddr: peerConn.relayAddr,
+        relayPort: peerConn.relayPort,
         aggressive: peerConn.aggressive,
         state: peerConn.getState(),
         ...peerConn.getTransfers(),
@@ -195,16 +207,23 @@ class LivePeerConnection {
     { fileName: string; progress: number }
   >();
   distantTag: string;
+  selfTag: string;
+  selfAddr?: string;
+  selfPort?: number;
   relayAddr: string;
   relayPort: number;
   aggressive = false;
 
   constructor(
     private fileHarbour: FileHarbor,
-    payload: WSFHRegisterPeerMessage["payload"]
+    payload: WSFHRegisterPeerMessage["payload"],
+    doNotConnect = false
   ) {
     this.peer = new SimplePeer(payload);
     this.distantTag = payload.distantTag;
+    this.selfTag = payload.selfTag;
+    this.selfAddr = payload.selfAddr;
+    this.selfPort = payload.selfPort;
     this.aggressive ||= !!payload.aggressive;
     this.relayAddr = payload.relayAddr;
     this.relayPort = payload.relayPort;
@@ -236,7 +255,7 @@ class LivePeerConnection {
         `🔌 Disconnected from "${this.distantTag}"`
       );
     });
-    void this.peer.requestSessionViaRelayAsync();
+    if (!doNotConnect) void this.peer.requestSessionViaRelayAsync();
   }
 
   onIncomingTransmissionStart = (fileName: string) => {
