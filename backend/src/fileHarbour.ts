@@ -91,7 +91,13 @@ export class FileHarbor {
       return;
     }
 
+    const transfers = isUpdate
+      ? getConnectionTransfersByDistantTag(distantTag)
+      : [];
+
     const connection = new LivePeerConnection(this, payload, isUpdate);
+    transfers.forEach((transfer) => connection.restoreTransfer(transfer));
+    if (isUpdate) liveConn?.clearListeners();
     this.peerConnectionMap.set(payload.distantTag, connection);
     if (!doNotInsert) {
       console.log(payload);
