@@ -2,7 +2,9 @@ import {
   createReadStream,
   createWriteStream,
   existsSync,
+  readFileSync,
   statSync,
+  writeFileSync,
 } from "node:fs";
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, resolve } from "node:path";
@@ -16,7 +18,18 @@ config;
 init();
 migrate();
 
-const logStream = createWriteStream(join(appHomeDir, "backend.log"), {
+const backendLogPath = join(appHomeDir, "backend.log");
+
+try {
+  const backendLogFile = readFileSync(backendLogPath);
+  const trimmedFIle = backendLogFile.subarray(
+    Math.max(backendLogFile.length - 300 * 1024, 0),
+    backendLogFile.length
+  );
+  writeFileSync(backendLogPath, trimmedFIle);
+} catch {}
+
+const logStream = createWriteStream(backendLogPath, {
   flags: "a",
 });
 process.stdout.write = logStream.write.bind(logStream);
