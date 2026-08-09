@@ -9,6 +9,7 @@ Before submitting:
 - Keep one problem or feature per issue.
 - Provide a clear description and reproduction steps when applicable.
 - Include relevant environment/version information.
+- (Optional but recommended) Add a tag to the issue to make it easier to sort and find.
 
 ## Description
 
