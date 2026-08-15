@@ -4,10 +4,10 @@ import type {
 } from "@commonTypes/fileHarbour.js";
 import { basename, join } from "node:path";
 import { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
-import { SimplePeer } from "peerce";
+import { getKnownTagsEntry, SimplePeer } from "peerce";
 import { writeFile, readFile } from "fs/promises";
 import { homedir } from "os";
-import { homeDirFolderName } from "./configProvider.js";
+import { homeDirFolderName, peerceHomeDir } from "./configProvider.js";
 import { mkdir } from "node:fs/promises";
 import {
   deleteConnection,
@@ -70,8 +70,8 @@ export class FileHarbor {
   peerConnectionMap = new Map<string, LivePeerConnection>();
   private reconnectingPeerTags = new Set<string>();
 
-  private notifyState = (): void => {
-    this.sendUpdateMessage(this.getConstructedState());
+  private notifyState = async (): Promise<void> => {
+    this.sendUpdateMessage(await this.getConstructedState());
   };
 
   registerPeer = (
@@ -190,21 +190,26 @@ export class FileHarbor {
     this.notifyState();
   };
 
-  getConstructedState = (): FileHarborState => {
-    const items: FileHarborStateItem[] = Array.from(
-      this.peerConnectionMap.entries(),
-      ([tag, peerConn]) => ({
-        tag,
-        selfTag: peerConn.selfTag,
-        selfAddr: peerConn.selfAddr,
-        selfPort: peerConn.selfPort,
-        relayAddr: peerConn.relayAddr,
-        relayPort: peerConn.relayPort,
-        aggressive: peerConn.aggressive,
-        encrypt: peerConn.encrypt,
-        state: peerConn.getState(),
-        fingerprint: "asdasdasadad",
-        ...peerConn.getTransfers(),
+  getConstructedState = async (): Promise<FileHarborState> => {
+    const items: FileHarborStateItem[] = await Promise.all(
+      Array.from(this.peerConnectionMap.entries(), async ([tag, peerConn]) => {
+        const knownTagsEntry = await getKnownTagsEntry(
+          tag,
+          join(peerceHomeDir, "vault")
+        ); // todo this is bad, cache this or something
+        return {
+          tag,
+          selfTag: peerConn.selfTag,
+          selfAddr: peerConn.selfAddr,
+          selfPort: peerConn.selfPort,
+          relayAddr: peerConn.relayAddr,
+          relayPort: peerConn.relayPort,
+          aggressive: peerConn.aggressive,
+          encrypt: peerConn.encrypt,
+          state: peerConn.getState(),
+          fingerprint: knownTagsEntry ? knownTagsEntry.fingerprint : undefined,
+          ...peerConn.getTransfers(),
+        };
       })
     );
     return { items };
@@ -274,6 +279,17 @@ class LivePeerConnection {
       }
       this.fileHarbour.sendUIMessage(
         `🔌 Disconnected from "${this.distantTag}"`
+      );
+    });
+    this.peer.on("onEncryptionNegotiationFailed", () => {
+      this.fileHarbour.sendUIMessage(
+        `❌ Negotiation failed with "${this.distantTag}" due to encryption settings mismatch`
+      );
+    });
+    this.peer.on("onPublicKeyMismatch", () => {
+      this.peer.close("SELF_CLOSE");
+      this.fileHarbour.sendUIMessage(
+        `⚠️ "${this.distantTag}" fingerprint check failed! This peer might be an impostor! Force disconnected...`
       );
     });
     if (!doNotConnect) void this.peer.requestSessionViaRelayAsync();

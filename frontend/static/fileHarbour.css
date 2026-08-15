@@ -399,6 +399,10 @@
   line-height: 1.2;
 }
 
+.file-harbour__workspace-peer-meta {
+  min-width: 0;
+}
+
 .file-harbour__workspace-avatar {
   position: relative;
   isolation: isolate;
@@ -444,6 +448,28 @@
 
 .file-harbour__workspace-status--connecting {
   color: #82b7ff;
+}
+
+.file-harbour__workspace-fingerprint {
+  margin: 7px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  color: rgba(232, 238, 247, 0.5);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.file-harbour__workspace-fingerprint span {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.file-harbour__workspace-fingerprint code {
+  color: rgba(232, 238, 247, 0.82);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  overflow-wrap: anywhere;
 }
 
 .file-harbour__workspace-actions {

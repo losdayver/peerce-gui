@@ -70,8 +70,8 @@ export class WssRouter {
         message.payload.tag,
         message.payload.fullFilePath
       ),
-    "file-harbour-request-state": (ws) => {
-      const state = this.fileHarbour.getConstructedState();
+    "file-harbour-request-state": async (ws) => {
+      const state = await this.fileHarbour.getConstructedState();
       this.sendMessage({ type: "file-harbour-state", payload: state });
     },
     "app-save-config": (_, data) => saveConfig(data.payload),
