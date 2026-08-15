@@ -215,6 +215,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
             selfPort: editingPeer?.selfPort,
             relayAddr: editingPeer?.relayAddr ?? "",
             relayPort: editingPeer?.relayPort,
+            encrypt: editingPeer?.encrypt ?? false,
           }}
           onConfirm={(data) => {
             if (!editingPeerTag) return;

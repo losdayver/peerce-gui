@@ -78,6 +78,7 @@ export interface WSFHEditPeerMessage {
     selfAddr?: string;
     selfPort?: number;
     aggressive?: boolean;
+    encrypt?: boolean;
   };
 }
 

@@ -321,6 +321,21 @@
   white-space: nowrap;
 }
 
+.file-harbour__peer-unsafe {
+  align-self: flex-start;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 74, 87, 0.7);
+  border-radius: 4px;
+  color: #ff5d69;
+  background: rgba(255, 38, 53, 0.12);
+  box-shadow: 0 0 10px rgba(255, 38, 53, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .file-harbour__peer-status {
   align-self: flex-end;
   display: inline-flex;

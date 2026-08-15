@@ -83,6 +83,7 @@ function toRegisterPeerPayload(
     relayAddr: data.relayAddr,
     relayPort: data.relayPort,
     aggressive: data.aggressive,
+    encrypt: data.encrypt,
   };
 }
 

@@ -16,8 +16,8 @@ export const insertNewConnection = (connection: FHConnectionTable) => {
   db.prepare(
     `
     insert into fh_connection 
-    (distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive)
-    values (?, ?, ?, ?, ?, ?, ?)
+    (distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive, encrypt)
+    values (?, ?, ?, ?, ?, ?, ?, ?)
     on conflict(distant_tag) do update set
       self_tag = excluded.self_tag,
       self_addr = excluded.self_addr,

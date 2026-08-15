@@ -156,6 +156,7 @@ export class FileHarbor {
         self_port,
         self_tag,
         aggressive,
+        encrypt,
       } = dbConnection;
 
       const connection = new LivePeerConnection(this, {
@@ -166,6 +167,7 @@ export class FileHarbor {
         selfAddr: self_addr ?? undefined,
         selfPort: self_port ?? undefined,
         aggressive: !!aggressive,
+        encrypt: !!encrypt,
       });
 
       transfers.forEach((transfer) => connection.restoreTransfer(transfer));
@@ -199,7 +201,9 @@ export class FileHarbor {
         relayAddr: peerConn.relayAddr,
         relayPort: peerConn.relayPort,
         aggressive: peerConn.aggressive,
+        encrypt: peerConn.encrypt,
         state: peerConn.getState(),
+        fingerprint: "asdasdasadad",
         ...peerConn.getTransfers(),
       })
     );
@@ -224,6 +228,7 @@ class LivePeerConnection {
   relayAddr: string;
   relayPort: number;
   aggressive: boolean;
+  encrypt: boolean;
   private relayRequestTimeout?: NodeJS.Timeout;
 
   constructor(
@@ -237,6 +242,7 @@ class LivePeerConnection {
     this.selfAddr = payload.selfAddr;
     this.selfPort = payload.selfPort;
     this.aggressive = !!payload.aggressive;
+    this.encrypt = !!payload.encrypt;
     this.relayAddr = payload.relayAddr;
     this.relayPort = payload.relayPort;
     this.peer.on("onFullMessage", this.onFullMessage);
