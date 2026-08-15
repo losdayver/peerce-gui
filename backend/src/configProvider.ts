@@ -4,15 +4,20 @@ import { readFile, writeFile } from "fs/promises";
 import { homedir } from "os";
 import { join } from "path";
 
-const globalAppConfigBase: GlobalAppConfig = {};
+const globalAppConfigBase: GlobalAppConfig = {
+  encrypt: true,
+};
 
 export const homeDirFolderName = ".peerce-gui";
+export const peerceHomeDirFolderName = ".peerce";
 export const appHomeDir = join(homedir(), homeDirFolderName);
+export const peerceHomeDir = join(homedir(), peerceHomeDirFolderName);
 
 const configFileBaseName = "config.json";
 const configFullPath = join(appHomeDir, configFileBaseName);
 
 mkdirSync(appHomeDir, { recursive: true });
+mkdirSync(peerceHomeDir, { recursive: true });
 const exists = existsSync(configFullPath);
 if (!exists)
   writeFileSync(configFullPath, JSON.stringify(globalAppConfigBase, null, 2));

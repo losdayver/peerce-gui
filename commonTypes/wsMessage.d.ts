@@ -43,6 +43,7 @@ export interface WSFHRegisterPeerMessage {
     selfAddr?: string;
     selfPort?: number;
     aggressive?: boolean;
+    encrypt?: boolean;
   };
 }
 

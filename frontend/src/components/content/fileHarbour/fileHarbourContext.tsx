@@ -47,17 +47,20 @@ const editPeerFormSchema = {
     component: "checkbox",
     title: "Aggressive mode",
     divideAfter: true,
+    hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
     component: "input",
     title: "Self address",
     validator: addressFormValidator,
+    hint: "If you want to bind your udp socket to a specific address",
   },
   selfPort: {
     component: "inputNum",
     title: "Self port",
     divideAfter: true,
     validator: portFormValidator,
+    hint: "If you want to bind your udp socket to a specific port",
   },
   relayAddr: {
     component: "input",
@@ -70,6 +73,10 @@ const editPeerFormSchema = {
     title: "Relay port",
     required: true,
     validator: portFormValidator,
+  },
+  encrypt: {
+    component: "checkbox",
+    title: "Use encryption",
   },
 } as const satisfies FormSchema;
 

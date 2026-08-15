@@ -39,6 +39,7 @@ export class FileHarbor {
         self_port,
         self_tag,
         aggressive,
+        encrypt,
       }) =>
         this.registerPeer(
           {
@@ -49,6 +50,7 @@ export class FileHarbor {
             selfPort: self_port ?? undefined,
             selfTag: self_tag,
             aggressive: !!aggressive,
+            encrypt: !!encrypt,
           },
           true
         )
@@ -109,6 +111,7 @@ export class FileHarbor {
         self_addr: selfAddr ?? null,
         self_port: selfPort ?? null,
         aggressive: payload.aggressive ? 1 : 0,
+        encrypt: payload.encrypt ? 1 : 0,
       });
     }
     this.notifyState();

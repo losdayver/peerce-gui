@@ -40,6 +40,7 @@ export interface FHConnectionTable {
   relay_addr: string;
   relay_port: number;
   aggressive: 1 | 0;
+  encrypt: 1 | 0;
 }
 
 export interface FHConnectionTransferTable {
@@ -80,6 +81,11 @@ export const migrate = () => {
   addColumnIfNotExists(
     "fh_connection",
     "aggressive",
+    "integer not null default 0"
+  );
+  addColumnIfNotExists(
+    "fh_connection",
+    "encrypt",
     "integer not null default 0"
   );
 };

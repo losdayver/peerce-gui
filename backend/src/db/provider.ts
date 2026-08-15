@@ -24,7 +24,8 @@ export const insertNewConnection = (connection: FHConnectionTable) => {
       self_port = excluded.self_port,
       relay_addr = excluded.relay_addr,
       relay_port = excluded.relay_port,
-      aggressive = excluded.aggressive
+      aggressive = excluded.aggressive,
+      encrypt = excluded.encrypt
     `
   ).run(
     c.distant_tag,
@@ -33,7 +34,8 @@ export const insertNewConnection = (connection: FHConnectionTable) => {
     c.self_port,
     c.relay_addr,
     c.relay_port,
-    c.aggressive
+    c.aggressive,
+    c.encrypt
   );
 };
 
@@ -67,7 +69,7 @@ export const insertNewConnectionTransfer = (
 
 export const getAllConnections = (): FHConnectionTable[] =>
   selectAll<FHConnectionTable>(`
-    select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive
+    select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive, encrypt
     from fh_connection
   `);
 
@@ -76,7 +78,7 @@ export const getConnectionsByDistantTag = (
 ): FHConnectionTable | undefined =>
   selectAll<FHConnectionTable>(
     `
-      select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive
+      select distant_tag, self_tag, self_addr, self_port, relay_addr, relay_port, aggressive, encrypt
       from fh_connection
       where distant_tag = ?
     `,

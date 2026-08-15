@@ -61,9 +61,12 @@ const formSchema = {
   relayPort: {
     title: "Relay port",
     component: "inputNum",
-    divideAfter: true,
     required: true,
     validator: portFormValidator,
+  },
+  encrypt: {
+    component: "checkbox",
+    title: "Use encryption",
   },
 } as const satisfies FormSchema;
 
