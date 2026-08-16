@@ -170,10 +170,24 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
   };
 
   const getCurrentPeerInfo = (): Promise<FileHarborCurrentPeerInfo> => {
-    return Promise.resolve({
-      publicKey: "none",
-      fingerprint: "none",
-      lastKeyCreationDate: "none",
+    if (!wsClient) return Promise.reject(new Error("WebSocket is unavailable"));
+
+    return new Promise((resolve) => {
+      const callback = (event: Event): void => {
+        const message = (event as CustomEvent<WSMessages>).detail;
+        if (
+          message.type !== "file-harbour-get-current-peer-info" ||
+          !message.payload
+        ) {
+          return;
+        }
+
+        wsClient.eventEmitter.removeEventListener("message", callback);
+        resolve(message.payload);
+      };
+
+      wsClient.eventEmitter.addEventListener("message", callback);
+      wsClient.sendMessage({ type: "file-harbour-get-current-peer-info" });
     });
   };
 

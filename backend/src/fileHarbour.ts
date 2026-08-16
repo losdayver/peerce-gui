@@ -1,10 +1,12 @@
 import type {
+  FileHarborCurrentPeerInfo,
   FileHarborState,
   FileHarborStateItem,
 } from "@commonTypes/fileHarbour.js";
 import { basename, join } from "node:path";
 import { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
-import { getKnownTagsEntry, SimplePeer } from "peerce";
+import { getKnownTagsEntry, SimplePeer, type KeysJson } from "peerce";
+import { createHash } from "node:crypto";
 import { writeFile, readFile } from "fs/promises";
 import { homedir } from "os";
 import { homeDirFolderName, peerceHomeDir } from "./configProvider.js";
@@ -213,6 +215,27 @@ export class FileHarbor {
       })
     );
     return { items };
+  };
+
+  getCurrentPeerInfo = async (): Promise<FileHarborCurrentPeerInfo> => {
+    const vaultDir = join(peerceHomeDir, "vault");
+    const keys = JSON.parse(
+      await readFile(join(vaultDir, "keys.json"), "utf8")
+    ) as KeysJson;
+    const latestKey = keys.at(-1);
+
+    if (!latestKey) throw new Error("No peer keys found");
+
+    const publicKey = await readFile(
+      join(vaultDir, latestKey.publicKeyFile),
+      "utf8"
+    );
+
+    return {
+      publicKey,
+      fingerprint: createHash("sha256").update(publicKey).digest("hex"),
+      lastKeyCreationDate: latestKey.dateCreated,
+    };
   };
 }
 

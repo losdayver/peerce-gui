@@ -89,6 +89,11 @@ function toRegisterPeerPayload(
   };
 }
 
+function formatKeyCreationDate(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
+
 export const FileHarbourActions: React.FC = () => {
   const [addPeerModalOpen, setAddPeerModalOpen] = useState(false);
   const [showPeerInfoModalOpen, setShowPeerInfoModalOpen] = useState(false);
@@ -125,10 +130,65 @@ export const FileHarbourActions: React.FC = () => {
         title="Peer info"
         open={showPeerInfoModalOpen}
         onClose={() => setShowPeerInfoModalOpen(false)}
+        style={{ width: 800, maxWidth: "100%" }}
       >
-        <div style={{ whiteSpaceCollapse: "break-spaces" }}>
-          {JSON.stringify(peerInfo, null, 2)}
-        </div>
+        {peerInfo && (
+          <section
+            className="file-harbour__peer-info"
+            aria-label="Local peer identity"
+          >
+            <header className="file-harbour__peer-info-summary">
+              <span
+                className="file-harbour__peer-info-mark"
+                aria-hidden="true"
+              >
+                ID
+              </span>
+              <div className="file-harbour__peer-info-heading">
+                <div className="file-harbour__peer-info-title-row">
+                  <h3>Local peer identity</h3>
+                  <span className="file-harbour__peer-info-status">
+                    Active key
+                  </span>
+                </div>
+                <p>
+                  Use the fingerprint to verify this peer on another device.
+                </p>
+              </div>
+            </header>
+
+            <dl className="file-harbour__peer-info-fields">
+              <div className="file-harbour__peer-info-field">
+                <dt>Fingerprint</dt>
+                <dd>
+                  <code>{peerInfo.fingerprint}</code>
+                </dd>
+              </div>
+
+              <div className="file-harbour__peer-info-field">
+                <dt>Key created</dt>
+                <dd>
+                  <time dateTime={peerInfo.lastKeyCreationDate}>
+                    {formatKeyCreationDate(peerInfo.lastKeyCreationDate)}
+                  </time>
+                </dd>
+              </div>
+
+              <div className="file-harbour__peer-info-field file-harbour__peer-info-field--key">
+                <dt>Public key</dt>
+                <dd>
+                  <pre>
+                    <code>{peerInfo.publicKey.trim()}</code>
+                  </pre>
+                </dd>
+              </div>
+            </dl>
+
+            <p className="file-harbour__peer-info-note">
+              This public key is safe to share. Your private key is not shown.
+            </p>
+          </section>
+        )}
       </Modal>
       <Modal
         title="Add new peer"

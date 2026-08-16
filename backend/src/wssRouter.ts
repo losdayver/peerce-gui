@@ -78,6 +78,15 @@ export class WssRouter {
     "app-get-config": async (_, data) => {
       this.sendMessage({ type: "app-get-config", payload: await getConfig() });
     },
+    "file-harbour-get-current-peer-info": async (ws) => {
+      this.sendMessage(
+        {
+          type: "file-harbour-get-current-peer-info",
+          payload: await this.fileHarbour.getCurrentPeerInfo(),
+        },
+        ws
+      );
+    },
   };
 
   constructor(private wss: WebSocketServer) {
