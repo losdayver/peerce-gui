@@ -5,7 +5,12 @@ import type {
 } from "@commonTypes/fileHarbour.js";
 import { basename, join } from "node:path";
 import { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
-import { getKnownTagsEntry, SimplePeer, type KeysJson } from "peerce";
+import {
+  getKnownTagsEntry,
+  SimplePeer,
+  type KeysJson,
+  type KnownTagsEntry,
+} from "peerce";
 import { createHash } from "node:crypto";
 import { writeFile, readFile } from "fs/promises";
 import { homedir } from "os";
@@ -193,25 +198,20 @@ export class FileHarbor {
   };
 
   getConstructedState = async (): Promise<FileHarborState> => {
-    const items: FileHarborStateItem[] = await Promise.all(
-      Array.from(this.peerConnectionMap.entries(), async ([tag, peerConn]) => {
-        const knownTagsEntry = await getKnownTagsEntry(
-          tag,
-          join(peerceHomeDir, "vault")
-        ); // todo this is bad, cache this or something
-        return {
-          tag,
-          selfTag: peerConn.selfTag,
-          selfAddr: peerConn.selfAddr,
-          selfPort: peerConn.selfPort,
-          relayAddr: peerConn.relayAddr,
-          relayPort: peerConn.relayPort,
-          aggressive: peerConn.aggressive,
-          encrypt: peerConn.encrypt,
-          state: peerConn.getState(),
-          fingerprint: knownTagsEntry ? knownTagsEntry.fingerprint : undefined,
-          ...peerConn.getTransfers(),
-        };
+    const items: FileHarborStateItem[] = Array.from(
+      this.peerConnectionMap.entries(),
+      ([tag, peerConn]) => ({
+        tag,
+        selfTag: peerConn.selfTag,
+        selfAddr: peerConn.selfAddr,
+        selfPort: peerConn.selfPort,
+        relayAddr: peerConn.relayAddr,
+        relayPort: peerConn.relayPort,
+        aggressive: peerConn.aggressive,
+        encrypt: peerConn.encrypt,
+        state: peerConn.getState(),
+        fingerprint: peerConn.getFingerprint(),
+        ...peerConn.getTransfers(),
       })
     );
     return { items };
@@ -257,6 +257,7 @@ class LivePeerConnection {
   relayPort: number;
   aggressive: boolean;
   encrypt: boolean;
+  private cachedKnownTagsEntry: KnownTagsEntry | false = false;
   private relayRequestTimeout?: NodeJS.Timeout;
 
   constructor(
@@ -273,6 +274,7 @@ class LivePeerConnection {
     this.encrypt = !!payload.encrypt;
     this.relayAddr = payload.relayAddr;
     this.relayPort = payload.relayPort;
+    void this.loadKnownTagsEntry();
     this.peer.on("onFullMessage", this.onFullMessage);
     this.peer.on(
       "onIncomingTransmissionStart",
@@ -287,8 +289,17 @@ class LivePeerConnection {
       this.onOutgoingTransmissionPercentageChange
     );
     this.peer.once("onConnectedToRelay", this.startRelayRequestTimeout);
-    this.peer.on("onConnectedToPeer", () => {
+    this.peer.on("onConnectedToPeer", (sessionRequest) => {
       this.clearRelayRequestTimeout();
+      if (sessionRequest.publicKey) {
+        this.cachedKnownTagsEntry = {
+          publicKey: sessionRequest.publicKey,
+          fingerprint: createHash("sha256")
+            .update(sessionRequest.publicKey)
+            .digest("hex"),
+          lastUpdate: new Date().toISOString(),
+        };
+      }
       this.fileHarbour.sendUIMessage(`🔌 Connected to "${this.distantTag}"`);
     });
     this.peer.on("onClosing", (reason) => {
@@ -309,13 +320,30 @@ class LivePeerConnection {
         `❌ Negotiation failed with "${this.distantTag}" due to encryption settings mismatch`
       );
     });
-    this.peer.on("onPublicKeyMismatch", () => {
+    this.peer.on("onPublicKeyMismatch", (_, knownTagsEntry) => {
+      this.cachedKnownTagsEntry = knownTagsEntry;
       this.fileHarbour.sendUIMessage(
         `⚠️ "${this.distantTag}" fingerprint check failed! This peer might be an impostor! Force disconnected...`
       );
     });
     if (!doNotConnect) void this.peer.requestSessionViaRelayAsync();
   }
+
+  private loadKnownTagsEntry = async (): Promise<void> => {
+    const knownTagsEntry = await getKnownTagsEntry(
+      this.distantTag,
+      join(peerceHomeDir, "vault")
+    );
+
+    if (!this.cachedKnownTagsEntry) {
+      this.cachedKnownTagsEntry = knownTagsEntry;
+    }
+  };
+
+  getFingerprint = (): string | undefined =>
+    this.cachedKnownTagsEntry
+      ? this.cachedKnownTagsEntry.fingerprint
+      : undefined;
 
   private startRelayRequestTimeout = (): void => {
     this.relayRequestTimeout = setTimeout(() => {
