@@ -124,12 +124,12 @@ export const FileHarbourWorkspace: React.FC = () => {
           >
             {activePeer.state}
           </p>
-          {activePeer.fingerprint && (
-            <p className="file-harbour__workspace-fingerprint">
-              <span>Fingerprint</span>
-              <code>{activePeer.fingerprint}</code>
-            </p>
-          )}
+          <p className="file-harbour__workspace-fingerprint">
+            <span>Fingerprint</span>
+            <code>
+              {activePeer.fingerprint ?? "no public key provided by peer yet"}
+            </code>
+          </p>
         </div>
       </header>
 

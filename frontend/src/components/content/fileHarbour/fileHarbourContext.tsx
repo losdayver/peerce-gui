@@ -7,7 +7,10 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import type { FileHarborState } from "@commonTypes/fileHarbour.js";
+import type {
+  FileHarborCurrentPeerInfo,
+  FileHarborState,
+} from "@commonTypes/fileHarbour.js";
 import type {
   WSFHAddTransferMessage,
   WSFHEditPeerMessage,
@@ -92,6 +95,7 @@ export interface FileHarbourContextValue {
   editPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
   openPeerFileDir: (tag: string) => Promise<void>;
+  getCurrentPeerInfo: () => Promise<FileHarborCurrentPeerInfo>;
 }
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);
@@ -165,6 +169,14 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     setTransferModalOpen(false);
   };
 
+  const getCurrentPeerInfo = (): Promise<FileHarborCurrentPeerInfo> => {
+    return Promise.resolve({
+      publicKey: "none",
+      fingerprint: "none",
+      lastKeyCreationDate: "none",
+    });
+  };
+
   const editingPeer = state.items.find((peer) => peer.tag === editingPeerTag);
 
   const openPeerFileDir = async (tag: string) => {
@@ -198,6 +210,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         editPeer,
         addTransfer,
         openPeerFileDir,
+        getCurrentPeerInfo,
       }}
     >
       <Modal

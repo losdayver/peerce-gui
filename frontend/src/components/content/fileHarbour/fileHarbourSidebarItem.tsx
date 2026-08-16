@@ -26,7 +26,7 @@ export const FileHarbourSidebarItem: React.FC<FileHarbourSidebarItemProps> = ({
       <span className="file-harbour__peer-meta">
         <span className="file-harbour__peer-name">{tag}</span>
         {!encrypt && (
-          <span className="file-harbour__peer-unsafe">unsafe</span>
+          <span className="file-harbour__peer-unencrypted">unencrypted</span>
         )}
         <span
           className={`file-harbour__peer-status file-harbour__peer-status--${state}`}

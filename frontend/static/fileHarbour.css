@@ -89,8 +89,8 @@
     box-shadow 150ms ease;
 }
 
-.file-harbour__peer:hover,
-.file-harbour__peer:focus-visible {
+.file-harbour__peer:not(.file-harbour__peer--active):hover,
+.file-harbour__peer:not(.file-harbour__peer--active):focus-visible {
   transform: translateX(2px);
   border-color: rgba(255, 255, 255, 0.13);
   background-color: rgba(255, 255, 255, 0.055);
@@ -107,9 +107,19 @@
       rgba(255, 255, 255, 0.035)
     ),
     rgba(35, 39, 50, 0.9);
-  box-shadow:
-    inset 3px 0 0 rgba(118, 228, 180, 0.74),
-    0 12px 26px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+}
+
+.file-harbour__peer--active::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 3px;
+  background: rgba(118, 228, 180, 0.74);
+  content: "";
+  pointer-events: none;
 }
 
 .file-harbour__peer--aggressive {
@@ -127,7 +137,9 @@
       rgba(210, 105, 32, 0.11),
       rgba(48, 29, 26, 0.94)
     );
-  background-size: 100% 100%, 220% 100%;
+  background-size:
+    100% 100%,
+    220% 100%;
   box-shadow:
     inset 0 0 14px rgba(255, 113, 37, 0.07),
     0 0 5px rgba(255, 95, 30, 0.18),
@@ -159,10 +171,13 @@
 .file-harbour__peer--aggressive.file-harbour__peer--active {
   border-color: rgba(255, 174, 82, 0.52);
   box-shadow:
-    inset 3px 0 0 rgba(255, 213, 126, 0.7),
     inset 0 0 16px rgba(255, 107, 31, 0.09),
     0 0 7px rgba(255, 91, 28, 0.24),
     0 0 17px rgba(255, 137, 50, 0.1);
+}
+
+.file-harbour__peer--aggressive.file-harbour__peer--active::before {
+  background: rgba(255, 213, 126, 0.7);
 }
 
 .file-harbour__peer:active {
@@ -205,7 +220,9 @@
       transparent 66%
     ),
     linear-gradient(145deg, #57251c, #9f3e1e 58%, #3e211f);
-  background-size: 130% 160%, 100% 100%;
+  background-size:
+    130% 160%,
+    100% 100%;
   box-shadow:
     inset 0 1px 0 rgba(255, 245, 202, 0.24),
     inset 0 -8px 15px rgba(112, 29, 15, 0.22),
@@ -241,14 +258,16 @@
   min-height: 44px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 7px;
 }
 
 @keyframes file-harbour-peer-burn {
   0%,
   100% {
-    background-position: 0 0, 0% 50%;
+    background-position:
+      0 0,
+      0% 50%;
     box-shadow:
       inset 0 0 13px rgba(255, 105, 31, 0.06),
       0 0 4px rgba(255, 88, 27, 0.16),
@@ -256,7 +275,9 @@
   }
 
   50% {
-    background-position: 0 0, 100% 50%;
+    background-position:
+      0 0,
+      100% 50%;
     box-shadow:
       inset 0 0 17px rgba(255, 129, 39, 0.1),
       0 0 7px rgba(255, 88, 27, 0.24),
@@ -272,11 +293,15 @@
 
 @keyframes file-harbour-icon-flame {
   from {
-    background-position: 50% 32%, 0 0;
+    background-position:
+      50% 32%,
+      0 0;
   }
 
   to {
-    background-position: 50% 66%, 0 0;
+    background-position:
+      50% 66%,
+      0 0;
   }
 }
 
@@ -288,8 +313,7 @@
 
 .file-harbour__peer--aggressive[data-state="offline"],
 .file-harbour__peer--aggressive[data-state="offline"]::after,
-.file-harbour__peer--aggressive[data-state="offline"]
-  .file-harbour__peer-icon,
+.file-harbour__peer--aggressive[data-state="offline"] .file-harbour__peer-icon,
 .file-harbour__peer--aggressive[data-state="offline"]
   .file-harbour__peer-initials,
 .file-harbour__workspace-avatar--aggressive[data-state="offline"],
@@ -321,19 +345,17 @@
   white-space: nowrap;
 }
 
-.file-harbour__peer-unsafe {
+.file-harbour__peer-unencrypted {
   align-self: flex-start;
-  padding: 3px 7px;
-  border: 1px solid rgba(255, 74, 87, 0.7);
-  border-radius: 4px;
-  color: #ff5d69;
-  background: rgba(255, 38, 53, 0.12);
-  box-shadow: 0 0 10px rgba(255, 38, 53, 0.18);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border: 1px solid rgba(232, 238, 247, 0.1);
+  border-radius: 999px;
+  color: rgba(232, 238, 247, 0.5);
+  background: rgba(232, 238, 247, 0.035);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .file-harbour__peer-status {
@@ -468,7 +490,8 @@
 
 .file-harbour__workspace-fingerprint code {
   color: rgba(232, 238, 247, 0.82);
-  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
   overflow-wrap: anywhere;
 }
 
@@ -605,7 +628,7 @@
     width: 100%;
     max-width: none;
     height: 42%;
-    min-height: 220px;
+    min-height: 300px;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }

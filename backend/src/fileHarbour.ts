@@ -287,7 +287,6 @@ class LivePeerConnection {
       );
     });
     this.peer.on("onPublicKeyMismatch", () => {
-      this.peer.close("SELF_CLOSE");
       this.fileHarbour.sendUIMessage(
         `⚠️ "${this.distantTag}" fingerprint check failed! This peer might be an impostor! Force disconnected...`
       );

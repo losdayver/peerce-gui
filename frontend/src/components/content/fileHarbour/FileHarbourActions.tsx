@@ -12,12 +12,14 @@ import {
   tagFormValidator,
 } from "./commonFormValidators";
 import { showToastMessage } from "@components/toast/toast";
+import { FileHarborCurrentPeerInfo } from "@commonTypes/fileHarbour";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
-  { title: "Add new peer", fn: null },
+  { title: "📄 Peer info", fn: null },
+  { title: "➕ Add new peer", fn: null },
 ];
 
-const formSchema = {
+const addPeerFormSchema = {
   selfTag: {
     title: "Self tag",
     component: "input",
@@ -70,7 +72,7 @@ const formSchema = {
   },
 } as const satisfies FormSchema;
 
-type FormData = InferDataFromSchema<typeof formSchema>;
+type FormData = InferDataFromSchema<typeof addPeerFormSchema>;
 
 function toRegisterPeerPayload(
   data: FormData
@@ -87,53 +89,76 @@ function toRegisterPeerPayload(
   };
 }
 
-export const FileHarbourAddPeerForm: React.FC = () => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const { registerPeer } = useFileHarbour();
+export const FileHarbourActions: React.FC = () => {
+  const [addPeerModalOpen, setAddPeerModalOpen] = useState(false);
+  const [showPeerInfoModalOpen, setShowPeerInfoModalOpen] = useState(false);
+  const [peerInfo, setPeerInfo] = useState<
+    FileHarborCurrentPeerInfo | undefined
+  >(undefined);
+  const { registerPeer, getCurrentPeerInfo } = useFileHarbour();
   const { getConfig } = useApp();
   const [config, setConfig] = useState<GlobalAppConfig>({});
 
   useEffect(() => {
-    const addPeerAction = fileHarbourHeaderActions[0];
+    const addPeerAction = fileHarbourHeaderActions[1];
     addPeerAction.fn = async () => {
       setConfig(await getConfig());
-      setModalOpen(true);
+      setAddPeerModalOpen(true);
+    };
+
+    const showPeerInfo = fileHarbourHeaderActions[0];
+    showPeerInfo.fn = async () => {
+      const peerInfo = await getCurrentPeerInfo();
+      setShowPeerInfoModalOpen(true);
+      setPeerInfo(peerInfo);
     };
 
     return () => {
       addPeerAction.fn = null;
+      showPeerInfo.fn = null;
     };
   }, []);
 
   return (
-    <Modal
-      title="Add new peer"
-      open={modalOpen}
-      onClose={() => setModalOpen(false)}
-    >
-      <Form
-        schema={formSchema}
-        initialData={config as any}
-        customValidate={({ distantTag, selfTag }) => {
-          if (distantTag == selfTag)
-            return [
-              {
-                fld: "distantTag",
-                severity: "warning",
-                message: "Distant tag cannot be the same as self tag",
-              },
-            ];
-          return [];
-        }}
-        onConfirm={(data) => {
-          const payload = toRegisterPeerPayload(data);
-          if (payload) {
-            registerPeer(payload);
-            setModalOpen(false);
-            showToastMessage({ title: "🔌 New peer registered" });
-          }
-        }}
-      />
-    </Modal>
+    <>
+      <Modal
+        title="Peer info"
+        open={showPeerInfoModalOpen}
+        onClose={() => setShowPeerInfoModalOpen(false)}
+      >
+        <div style={{ whiteSpaceCollapse: "break-spaces" }}>
+          {JSON.stringify(peerInfo, null, 2)}
+        </div>
+      </Modal>
+      <Modal
+        title="Add new peer"
+        open={addPeerModalOpen}
+        onClose={() => setAddPeerModalOpen(false)}
+      >
+        <Form
+          schema={addPeerFormSchema}
+          initialData={config as any}
+          customValidate={({ distantTag, selfTag }) => {
+            if (distantTag == selfTag)
+              return [
+                {
+                  fld: "distantTag",
+                  severity: "warning",
+                  message: "Distant tag cannot be the same as self tag",
+                },
+              ];
+            return [];
+          }}
+          onConfirm={(data) => {
+            const payload = toRegisterPeerPayload(data);
+            if (payload) {
+              registerPeer(payload);
+              setAddPeerModalOpen(false);
+              showToastMessage({ title: "🔌 New peer registered" });
+            }
+          }}
+        />
+      </Modal>
+    </>
   );
 };

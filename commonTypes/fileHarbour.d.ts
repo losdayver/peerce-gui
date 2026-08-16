@@ -22,3 +22,9 @@ export interface FileHarborStateItemTransfer {
 export interface FileHarborState {
   items: FileHarborStateItem[];
 }
+
+export interface FileHarborCurrentPeerInfo {
+  publicKey: string;
+  fingerprint: string;
+  lastKeyCreationDate: string;
+}
