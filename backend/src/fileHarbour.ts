@@ -390,7 +390,7 @@ class LivePeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: 0,
+        incoming: 1,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };
@@ -406,7 +406,7 @@ class LivePeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: 1,
+        incoming: 0,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };

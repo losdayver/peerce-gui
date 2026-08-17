@@ -1,6 +1,6 @@
 [package]
 name = "peerce-gui"
-version = "0.2.0-5"
+version = "0.2.0-6"
 description = "Peerce GUI"
 edition = "2021"
 
