@@ -93,7 +93,7 @@ export const FileHarbourWorkspace: React.FC = () => {
     reconnectPeer,
     addTransfer,
     openPeerFileDir,
-    editPeer
+    editPeer,
   } = useFileHarbour();
   const activePeer = state.items.find((peer) => peer.tag === activePeerTag);
 
@@ -117,12 +117,18 @@ export const FileHarbourWorkspace: React.FC = () => {
             {getInitials(activePeer.tag)}
           </span>
         </span>
-        <div>
+        <div className="file-harbour__workspace-peer-meta">
           <h2>{activePeer.tag}</h2>
           <p
             className={`file-harbour__workspace-status file-harbour__workspace-status--${activePeer.state}`}
           >
             {activePeer.state}
+          </p>
+          <p className="file-harbour__workspace-fingerprint">
+            <span>Fingerprint</span>
+            <code>
+              {activePeer.fingerprint ?? "no public key provided by peer yet"}
+            </code>
           </p>
         </div>
       </header>
@@ -151,7 +157,10 @@ export const FileHarbourWorkspace: React.FC = () => {
         <Button onClick={() => openPeerFileDir(activePeer.tag)}>
           📂 Open folder
         </Button>
-        <Button disabled={activePeer.state != "offline"} onClick={() => editPeer(activePeer.tag)}>
+        <Button
+          disabled={activePeer.state != "offline"}
+          onClick={() => editPeer(activePeer.tag)}
+        >
           ✏️ Edit
         </Button>
       </div>

@@ -11,6 +11,7 @@ export const FileHarbourSidebarItem: React.FC<FileHarbourSidebarItemProps> = ({
   active,
   onClick,
   aggressive,
+  encrypt,
 }) => {
   return (
     <button
@@ -24,6 +25,9 @@ export const FileHarbourSidebarItem: React.FC<FileHarbourSidebarItemProps> = ({
       </span>
       <span className="file-harbour__peer-meta">
         <span className="file-harbour__peer-name">{tag}</span>
+        {!encrypt && (
+          <span className="file-harbour__peer-unencrypted">unencrypted</span>
+        )}
         <span
           className={`file-harbour__peer-status file-harbour__peer-status--${state}`}
         >

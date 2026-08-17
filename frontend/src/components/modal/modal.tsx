@@ -8,6 +8,7 @@ export interface ModalProps {
   onClose?: () => void;
   open?: boolean;
   title?: string;
+  style?: React.CSSProperties;
 }
 
 export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
@@ -15,12 +16,11 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   onClose,
   children,
   title,
+  style,
 }) => {
   const modalContainer =
     document.querySelector<HTMLDivElement>("#modal-container")!;
-  const [phase, setPhase] = useState<ModalPhase>(
-    open ? "opening" : "closed"
-  );
+  const [phase, setPhase] = useState<ModalPhase>(open ? "opening" : "closed");
 
   useEffect(() => {
     setPhase((currentPhase) => {
@@ -59,7 +59,12 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
         }
       }}
     >
-      <div className="modal__dialog" role="dialog" aria-modal="true">
+      <div
+        className="modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        style={style}
+      >
         <div className="modal__header">
           <span>{title ?? ""}</span>
           <Button aria-label="Close dialog" onClick={onClose}>

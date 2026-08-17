@@ -14,11 +14,11 @@ import {
 } from "./sideBar";
 import { ContentWindow } from "./contentWindow";
 import { FileHarbour } from "@content/fileHarbour/fileHarbour";
-import { fileHarbourHeaderActions } from "@components/content/fileHarbour/fileHarbourAddPeerForm";
 import { WsClient, wsClientContext } from "@interop/wsClient";
 import { Empty } from "@utils";
 import { GlobalAppConfig } from "@commonTypes/app";
 import { WSMessages } from "@commonTypes/wsMessage";
+import { fileHarbourHeaderActions } from "@components/content/fileHarbour/FileHarbourActions";
 
 export interface AppContextValue {
   saveConfig: (config: GlobalAppConfig) => void;

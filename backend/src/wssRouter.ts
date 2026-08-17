@@ -70,13 +70,22 @@ export class WssRouter {
         message.payload.tag,
         message.payload.fullFilePath
       ),
-    "file-harbour-request-state": (ws) => {
-      const state = this.fileHarbour.getConstructedState();
+    "file-harbour-request-state": async (ws) => {
+      const state = await this.fileHarbour.getConstructedState();
       this.sendMessage({ type: "file-harbour-state", payload: state });
     },
     "app-save-config": (_, data) => saveConfig(data.payload),
     "app-get-config": async (_, data) => {
       this.sendMessage({ type: "app-get-config", payload: await getConfig() });
+    },
+    "file-harbour-get-current-peer-info": async (ws) => {
+      this.sendMessage(
+        {
+          type: "file-harbour-get-current-peer-info",
+          payload: await this.fileHarbour.getCurrentPeerInfo(),
+        },
+        ws
+      );
     },
   };
 

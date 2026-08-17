@@ -4,10 +4,27 @@
 
 # Peerce GUI
 
-Peerce GUI is a desktop interface for connecting peers and transferring files with [Peerce](https://www.npmjs.com/package/peerce). It provides peer management, connection status, transfer progress, and persistent transfer history in a native Tauri application.
+Peerce GUI is a desktop interface for connecting peers and transferring files with [Peerce](https://www.npmjs.com/package/peerce). It provides peer management, optional encrypted connections, fingerprint verification, transfer progress, and persistent transfer history in a native Tauri application.
 
 > [!WARNING]
 > **Peerce GUI is currently in active development.** Features and configuration may change; some functionality is incomplete, and the application is not yet recommended for production use.
+
+Current pre-release: **0.2.0-6**.
+
+## Features
+
+- Peer registration, editing, reconnecting, and aggressive reconnect mode
+- Optional encrypted peer-to-peer file transfers
+- Local and remote public-key fingerprints for out-of-band verification
+- Trust-on-first-use protection that rejects a changed key for a known peer
+- Incoming and outgoing transfer progress with persistent history
+- Direct access to received files from the application
+
+## Encryption and peer identity
+
+Peerce GUI creates a local key pair on first startup and stores it in `~/.peerce/vault`. Private keys stay on the local machine and are not displayed by the application.
+
+For an encrypted connection, both peers must enable encryption. The first public key received for a peer tag is remembered. If that tag later presents a different key, the connection is rejected. Use **Peer info** to compare the local fingerprint through a separate trusted channel.
 
 ## Preview
 
@@ -32,7 +49,7 @@ npm run dev
 To start a local Peerce relay for development:
 
 ```bash
-npm run peerce-relay-local
+npm run peerce-start-relay-local
 ```
 
 ## Build

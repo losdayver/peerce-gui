@@ -117,6 +117,10 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
               validator: portFormValidator,
               required: true,
             },
+            encrypt: {
+              component: "checkbox",
+              title: "Use encryption",
+            },
           }}
           onConfirm={(data) => {
             saveConfig(data as any);

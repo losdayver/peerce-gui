@@ -7,7 +7,10 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import type { FileHarborState } from "@commonTypes/fileHarbour.js";
+import type {
+  FileHarborCurrentPeerInfo,
+  FileHarborState,
+} from "@commonTypes/fileHarbour.js";
 import type {
   WSFHAddTransferMessage,
   WSFHEditPeerMessage,
@@ -47,17 +50,20 @@ const editPeerFormSchema = {
     component: "checkbox",
     title: "Aggressive mode",
     divideAfter: true,
+    hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
     component: "input",
     title: "Self address",
     validator: addressFormValidator,
+    hint: "If you want to bind your udp socket to a specific address",
   },
   selfPort: {
     component: "inputNum",
     title: "Self port",
     divideAfter: true,
     validator: portFormValidator,
+    hint: "If you want to bind your udp socket to a specific port",
   },
   relayAddr: {
     component: "input",
@@ -70,6 +76,10 @@ const editPeerFormSchema = {
     title: "Relay port",
     required: true,
     validator: portFormValidator,
+  },
+  encrypt: {
+    component: "checkbox",
+    title: "Use encryption",
   },
 } as const satisfies FormSchema;
 
@@ -85,6 +95,7 @@ export interface FileHarbourContextValue {
   editPeer: (tag: string) => void;
   addTransfer: (tag: string) => void;
   openPeerFileDir: (tag: string) => Promise<void>;
+  getCurrentPeerInfo: () => Promise<FileHarborCurrentPeerInfo>;
 }
 
 const FileHarbourContext = createContext<FileHarbourContextValue | null>(null);
@@ -158,6 +169,28 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
     setTransferModalOpen(false);
   };
 
+  const getCurrentPeerInfo = (): Promise<FileHarborCurrentPeerInfo> => {
+    if (!wsClient) return Promise.reject(new Error("WebSocket is unavailable"));
+
+    return new Promise((resolve) => {
+      const callback = (event: Event): void => {
+        const message = (event as CustomEvent<WSMessages>).detail;
+        if (
+          message.type !== "file-harbour-get-current-peer-info" ||
+          !message.payload
+        ) {
+          return;
+        }
+
+        wsClient.eventEmitter.removeEventListener("message", callback);
+        resolve(message.payload);
+      };
+
+      wsClient.eventEmitter.addEventListener("message", callback);
+      wsClient.sendMessage({ type: "file-harbour-get-current-peer-info" });
+    });
+  };
+
   const editingPeer = state.items.find((peer) => peer.tag === editingPeerTag);
 
   const openPeerFileDir = async (tag: string) => {
@@ -191,6 +224,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         editPeer,
         addTransfer,
         openPeerFileDir,
+        getCurrentPeerInfo,
       }}
     >
       <Modal
@@ -208,6 +242,7 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
             selfPort: editingPeer?.selfPort,
             relayAddr: editingPeer?.relayAddr ?? "",
             relayPort: editingPeer?.relayPort,
+            encrypt: editingPeer?.encrypt ?? false,
           }}
           onConfirm={(data) => {
             if (!editingPeerTag) return;

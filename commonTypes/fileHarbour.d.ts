@@ -7,6 +7,8 @@ export interface FileHarborStateItem {
   relayPort: number;
   state: "offline" | "request sent" | "connected" | "connecting";
   aggressive: boolean;
+  encrypt: boolean;
+  fingerprint?: string;
   incomingTransfers: FileHarborStateItemTransfer[];
   outgoingTransfers: FileHarborStateItemTransfer[];
 }
@@ -19,4 +21,10 @@ export interface FileHarborStateItemTransfer {
 
 export interface FileHarborState {
   items: FileHarborStateItem[];
+}
+
+export interface FileHarborCurrentPeerInfo {
+  publicKey: string;
+  fingerprint: string;
+  lastKeyCreationDate: string;
 }

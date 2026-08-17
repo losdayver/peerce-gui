@@ -1,13 +1,20 @@
 import type {
+  FileHarborCurrentPeerInfo,
   FileHarborState,
   FileHarborStateItem,
 } from "@commonTypes/fileHarbour.js";
 import { basename, join } from "node:path";
 import { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
-import { SimplePeer } from "peerce";
+import {
+  getKnownTagsEntry,
+  SimplePeer,
+  type KeysJson,
+  type KnownTagsEntry,
+} from "peerce";
+import { createHash } from "node:crypto";
 import { writeFile, readFile } from "fs/promises";
 import { homedir } from "os";
-import { homeDirFolderName } from "./configProvider.js";
+import { homeDirFolderName, peerceHomeDir } from "./configProvider.js";
 import { mkdir } from "node:fs/promises";
 import {
   deleteConnection,
@@ -39,6 +46,7 @@ export class FileHarbor {
         self_port,
         self_tag,
         aggressive,
+        encrypt,
       }) =>
         this.registerPeer(
           {
@@ -49,6 +57,7 @@ export class FileHarbor {
             selfPort: self_port ?? undefined,
             selfTag: self_tag,
             aggressive: !!aggressive,
+            encrypt: !!encrypt,
           },
           true
         )
@@ -68,8 +77,8 @@ export class FileHarbor {
   peerConnectionMap = new Map<string, LivePeerConnection>();
   private reconnectingPeerTags = new Set<string>();
 
-  private notifyState = (): void => {
-    this.sendUpdateMessage(this.getConstructedState());
+  private notifyState = async (): Promise<void> => {
+    this.sendUpdateMessage(await this.getConstructedState());
   };
 
   registerPeer = (
@@ -109,6 +118,7 @@ export class FileHarbor {
         self_addr: selfAddr ?? null,
         self_port: selfPort ?? null,
         aggressive: payload.aggressive ? 1 : 0,
+        encrypt: payload.encrypt ? 1 : 0,
       });
     }
     this.notifyState();
@@ -153,6 +163,7 @@ export class FileHarbor {
         self_port,
         self_tag,
         aggressive,
+        encrypt,
       } = dbConnection;
 
       const connection = new LivePeerConnection(this, {
@@ -163,6 +174,7 @@ export class FileHarbor {
         selfAddr: self_addr ?? undefined,
         selfPort: self_port ?? undefined,
         aggressive: !!aggressive,
+        encrypt: !!encrypt,
       });
 
       transfers.forEach((transfer) => connection.restoreTransfer(transfer));
@@ -185,7 +197,7 @@ export class FileHarbor {
     this.notifyState();
   };
 
-  getConstructedState = (): FileHarborState => {
+  getConstructedState = async (): Promise<FileHarborState> => {
     const items: FileHarborStateItem[] = Array.from(
       this.peerConnectionMap.entries(),
       ([tag, peerConn]) => ({
@@ -196,11 +208,34 @@ export class FileHarbor {
         relayAddr: peerConn.relayAddr,
         relayPort: peerConn.relayPort,
         aggressive: peerConn.aggressive,
+        encrypt: peerConn.encrypt,
         state: peerConn.getState(),
+        fingerprint: peerConn.getFingerprint(),
         ...peerConn.getTransfers(),
       })
     );
     return { items };
+  };
+
+  getCurrentPeerInfo = async (): Promise<FileHarborCurrentPeerInfo> => {
+    const vaultDir = join(peerceHomeDir, "vault");
+    const keys = JSON.parse(
+      await readFile(join(vaultDir, "keys.json"), "utf8")
+    ) as KeysJson;
+    const latestKey = keys.at(-1);
+
+    if (!latestKey) throw new Error("No peer keys found");
+
+    const publicKey = await readFile(
+      join(vaultDir, latestKey.publicKeyFile),
+      "utf8"
+    );
+
+    return {
+      publicKey,
+      fingerprint: createHash("sha256").update(publicKey).digest("hex"),
+      lastKeyCreationDate: latestKey.dateCreated,
+    };
   };
 }
 
@@ -221,6 +256,8 @@ class LivePeerConnection {
   relayAddr: string;
   relayPort: number;
   aggressive: boolean;
+  encrypt: boolean;
+  private cachedKnownTagsEntry: KnownTagsEntry | false = false;
   private relayRequestTimeout?: NodeJS.Timeout;
 
   constructor(
@@ -234,8 +271,10 @@ class LivePeerConnection {
     this.selfAddr = payload.selfAddr;
     this.selfPort = payload.selfPort;
     this.aggressive = !!payload.aggressive;
+    this.encrypt = !!payload.encrypt;
     this.relayAddr = payload.relayAddr;
     this.relayPort = payload.relayPort;
+    void this.loadKnownTagsEntry();
     this.peer.on("onFullMessage", this.onFullMessage);
     this.peer.on(
       "onIncomingTransmissionStart",
@@ -250,8 +289,17 @@ class LivePeerConnection {
       this.onOutgoingTransmissionPercentageChange
     );
     this.peer.once("onConnectedToRelay", this.startRelayRequestTimeout);
-    this.peer.on("onConnectedToPeer", () => {
+    this.peer.on("onConnectedToPeer", (sessionRequest) => {
       this.clearRelayRequestTimeout();
+      if (sessionRequest.publicKey) {
+        this.cachedKnownTagsEntry = {
+          publicKey: sessionRequest.publicKey,
+          fingerprint: createHash("sha256")
+            .update(sessionRequest.publicKey)
+            .digest("hex"),
+          lastUpdate: new Date().toISOString(),
+        };
+      }
       this.fileHarbour.sendUIMessage(`🔌 Connected to "${this.distantTag}"`);
     });
     this.peer.on("onClosing", (reason) => {
@@ -267,8 +315,35 @@ class LivePeerConnection {
         `🔌 Disconnected from "${this.distantTag}"`
       );
     });
+    this.peer.on("onEncryptionNegotiationFailed", () => {
+      this.fileHarbour.sendUIMessage(
+        `❌ Negotiation failed with "${this.distantTag}" due to encryption settings mismatch`
+      );
+    });
+    this.peer.on("onPublicKeyMismatch", (_, knownTagsEntry) => {
+      this.cachedKnownTagsEntry = knownTagsEntry;
+      this.fileHarbour.sendUIMessage(
+        `⚠️ "${this.distantTag}" fingerprint check failed! This peer might be an impostor! Force disconnected...`
+      );
+    });
     if (!doNotConnect) void this.peer.requestSessionViaRelayAsync();
   }
+
+  private loadKnownTagsEntry = async (): Promise<void> => {
+    const knownTagsEntry = await getKnownTagsEntry(
+      this.distantTag,
+      join(peerceHomeDir, "vault")
+    );
+
+    if (!this.cachedKnownTagsEntry) {
+      this.cachedKnownTagsEntry = knownTagsEntry;
+    }
+  };
+
+  getFingerprint = (): string | undefined =>
+    this.cachedKnownTagsEntry
+      ? this.cachedKnownTagsEntry.fingerprint
+      : undefined;
 
   private startRelayRequestTimeout = (): void => {
     this.relayRequestTimeout = setTimeout(() => {
@@ -315,7 +390,7 @@ class LivePeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: 0,
+        incoming: 1,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };
@@ -331,7 +406,7 @@ class LivePeerConnection {
       insertNewConnectionTransfer({
         distant_tag: this.distantTag,
         file_name: basename(transfer.fileName),
-        incoming: 1,
+        incoming: 0,
         state: FHConnectionTransferTableState.COMPLETED,
       });
   };

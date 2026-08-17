@@ -1,7 +1,9 @@
 import {
+  accessSync,
   createReadStream,
   createWriteStream,
   existsSync,
+  mkdirSync,
   readFileSync,
   statSync,
   writeFileSync,
@@ -12,13 +14,23 @@ import { WebSocketServer } from "ws";
 import { WssRouter } from "./wssRouter.js";
 import * as config from "./configProvider.js";
 import { init, migrate } from "./db/initAndMigrate.js";
-import { appHomeDir } from "./configProvider.js";
+import { appHomeDir, peerceHomeDir } from "./configProvider.js";
+import { createAndSaveKeyPair } from "peerce";
 config;
 
 init();
 migrate();
 
 const backendLogPath = join(appHomeDir, "backend.log");
+
+try {
+  const keysJson = JSON.parse(
+    readFileSync(join(peerceHomeDir, "vault", "keys.json")).toString()
+  );
+  if (!keysJson.length) throw new Error();
+} catch {
+  createAndSaveKeyPair(join(peerceHomeDir, "vault"));
+}
 
 try {
   const backendLogFile = readFileSync(backendLogPath);

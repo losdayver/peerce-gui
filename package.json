@@ -1,6 +1,6 @@
 {
   "name": "peerce-gui",
-  "version": "0.2.0-5",
+  "version": "0.2.0-6",
   "private": true,
   "type": "module",
   "engines": {
@@ -14,7 +14,7 @@
     "watch:frontend": "nodemon --watch frontend --watch commonTypes --watch vite.frontend.config.ts --watch scripts/copy-frontend.mjs --ext ts,tsx,js,mjs,json,html,css --exec \"npm run compile:frontend\"",
     "watch:backend": "nodemon --watch backend --watch commonTypes --watch vite.backend.config.ts --ext ts,js,json --exec \"npm run compile:backend && node dist/backend/server.js\"",
     "watch:dev": "node scripts/watch-dev.mjs",
-    "peerce-relay-local": "npx peerce-relay --selfAddr 0.0.0.0 --selfPort 56443",
+    "peerce-start-relay-local": "npx peerce-start-relay --selfAddr 0.0.0.0 --selfPort 56443",
     "dev": "tauri dev",
     "build": "tauri build"
   },
@@ -32,7 +32,7 @@
   "dependencies": {
     "@tauri-apps/plugin-dialog": "^2.7.2",
     "@tauri-apps/plugin-opener": "^2.5.4",
-    "peerce": "^0.2.0-alpha.3",
+    "peerce": "^0.2.0-alpha.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "ws": "^8.21.1"

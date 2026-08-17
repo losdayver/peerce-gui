@@ -1,5 +1,8 @@
 import { GlobalAppConfig } from "./app.js";
-import { FileHarborState } from "./fileHarbour.js";
+import {
+  FileHarborCurrentPeerInfo,
+  FileHarborState,
+} from "./fileHarbour.js";
 
 export interface WSGenericMessage {
   type: string;
@@ -18,7 +21,8 @@ export type WSMessages =
   | WSFHUnregisterPeerMessage
   | WSFHReconnectPeerMessage
   | WSFileHarbourUIMessage
-  | WSFHEditPeerMessage;
+  | WSFHEditPeerMessage
+  | WSFHGetCurrentPeerInfoMessage;
 
 //#region mutual exchange
 export interface WSTestMessage {
@@ -29,6 +33,11 @@ export interface WSTestMessage {
 export interface WSAppGetConfigMessage {
   type: "app-get-config";
   payload?: GlobalAppConfig;
+}
+
+export interface WSFHGetCurrentPeerInfoMessage {
+  type: "file-harbour-get-current-peer-info";
+  payload?: FileHarborCurrentPeerInfo;
 }
 //#endregion
 
@@ -43,6 +52,7 @@ export interface WSFHRegisterPeerMessage {
     selfAddr?: string;
     selfPort?: number;
     aggressive?: boolean;
+    encrypt?: boolean;
   };
 }
 
@@ -77,6 +87,7 @@ export interface WSFHEditPeerMessage {
     selfAddr?: string;
     selfPort?: number;
     aggressive?: boolean;
+    encrypt?: boolean;
   };
 }
 
