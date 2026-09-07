@@ -19,6 +19,7 @@ import { Empty } from "@utils";
 import { GlobalAppConfig } from "@commonTypes/app";
 import { WSMessages } from "@commonTypes/wsMessage";
 import { fileHarbourHeaderActions } from "@components/content/fileHarbour/FileHarbourActions";
+import React from "react";
 
 export interface AppContextValue {
   saveConfig: (config: GlobalAppConfig) => void;
