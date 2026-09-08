@@ -3,6 +3,7 @@ import path from "node:path";
 
 export default defineConfig({
   root: path.resolve(__dirname, "frontend"),
+  base: "./",
   resolve: {
     alias: {
       "@components": path.resolve(__dirname, "frontend/src/components"),
@@ -19,16 +20,5 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/frontend"),
     emptyOutDir: true,
     sourcemap: "inline",
-
-    rollupOptions: {
-      input: path.resolve(__dirname, "frontend/src/index.tsx"), 
-      output: {
-        entryFileNames: "app.js",
-        chunkFileNames: "app.js", 
-        assetFileNames: "[name].[ext]",
-
-        codeSplitting: false,
-      },
-    },
   },
 });

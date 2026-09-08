@@ -12,8 +12,15 @@ import {
 } from "./commonFormValidators";
 import { showToastMessage } from "@components/toast/toast";
 import { FileHarborCurrentPeerInfo } from "@commonTypes/fileHarbour";
-import { DataForm, FormSchema, InferDataFromSchema } from "formutate";
+import {
+  DataForm,
+  FormSchema,
+  GFI,
+  GridGroup,
+  InferDataFromSchema,
+} from "formutate";
 import { componentFactory } from "@components/intrinsic/componentFactory";
+import { dataFormDefaultStyle } from "@components/utils";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "📄 Peer info", fn: null },
@@ -190,11 +197,17 @@ export const FileHarbourActions: React.FC = () => {
         title="Add new peer"
         open={addPeerModalOpen}
         onClose={() => setAddPeerModalOpen(false)}
+        style={{ width: "600px" }}
       >
         <DataForm
           componentFactory={componentFactory}
           schema={addPeerFormSchema}
-          initialData={config as any}
+          initialData={config}
+          gridStyle={{
+            ...dataFormDefaultStyle,
+            gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr));",
+            gridAutoColumns: "unset",
+          }}
           customValidate={({ distantTag, selfTag }) => {
             if (distantTag == selfTag)
               return [
@@ -214,7 +227,24 @@ export const FileHarbourActions: React.FC = () => {
               showToastMessage({ title: "🔌 New peer registered" });
             }
           }}
-        />
+        >
+          <GridGroup header="Tags">
+            {GFI("selfTag")}
+            {GFI("distantTag")}
+          </GridGroup>
+          <GridGroup header="Socket binding">
+            {GFI("selfAddr")}
+            {GFI("selfPort")}
+          </GridGroup>
+          <GridGroup header="Relay configuration">
+            {GFI("relayAddr")}
+            {GFI("relayPort")}
+          </GridGroup>
+          <GridGroup split header="Miscellaneous">
+            {GFI("aggressive")}
+            {GFI("encrypt")}
+          </GridGroup>
+        </DataForm>
       </Modal>
     </>
   );

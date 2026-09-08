@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@intrinsic/button";
 
@@ -20,6 +20,7 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
 }) => {
   const modalContainer =
     document.querySelector<HTMLDivElement>("#modal-container")!;
+  const modalRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<ModalPhase>(open ? "opening" : "closed");
 
   useEffect(() => {
@@ -41,12 +42,39 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
     return () => cancelAnimationFrame(animationFrame);
   }, [phase]);
 
+  useEffect(() => {
+    if (phase !== "open" || !onClose) return;
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (
+        event.key !== "Escape" ||
+        event.defaultPrevented ||
+        event.isComposing ||
+        event.repeat
+      ) {
+        return;
+      }
+
+      const visibleModals =
+        modalContainer.querySelectorAll<HTMLDivElement>(".modal--visible");
+      const topModal = visibleModals.item(visibleModals.length - 1);
+      if (topModal !== modalRef.current) return;
+
+      event.preventDefault();
+      onClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [modalContainer, onClose, phase]);
+
   if (phase === "closed") return null;
 
   const visible = phase === "open";
 
   return createPortal(
     <div
+      ref={modalRef}
       className={`modal${visible ? " modal--visible" : ""}`}
       aria-hidden={!visible}
       onTransitionEnd={(event) => {

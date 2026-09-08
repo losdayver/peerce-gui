@@ -28,7 +28,6 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  box-sizing: border-box;
 }
 
 .file-harbour__peer-list {
@@ -81,7 +80,7 @@
     ),
     rgba(35, 39, 50, 0.72);
   cursor: pointer;
-  box-sizing: border-box;
+
   transition:
     transform 150ms ease,
     border-color 150ms ease,
@@ -402,7 +401,6 @@
   min-height: 0;
   padding: 24px;
   overflow-y: auto;
-  box-sizing: border-box;
 }
 
 .file-harbour__workspace-peer {
@@ -703,7 +701,6 @@
   font: inherit;
   text-align: left;
   background: transparent;
-  box-sizing: border-box;
 }
 
 .file-harbour__transfer--clickable {
