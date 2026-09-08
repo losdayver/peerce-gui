@@ -1,3 +1,11 @@
+@import "./sidebar.css";
+@import "./intrinsic.css";
+@import "./modal.css";
+@import "./contentWindow.css";
+@import "./fileHarbour.css";
+@import "./form.css";
+@import "./toast.css";
+
 :root {
   --main-bg: #17191f;
   --secondary-bg: #282c39;

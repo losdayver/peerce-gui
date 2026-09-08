@@ -10,8 +10,6 @@
       transparent 30%
     ),
     var(--main-bg);
-  overflow: auto;
-  box-sizing: border-box;
 }
 
 .content-wrap {
@@ -28,7 +26,6 @@
     rgba(31, 34, 44, 0.98)
   );
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
-  box-sizing: border-box;
 }
 
 .content-wrap__header {
@@ -45,7 +42,6 @@
   font-weight: 700;
   line-height: 1.25;
   background-color: rgba(255, 255, 255, 0.025);
-  box-sizing: border-box;
 }
 
 .content-wrap__header-title {
@@ -66,7 +62,6 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  box-sizing: border-box;
 }
 
 @media (max-width: 720px) {

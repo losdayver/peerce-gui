@@ -1,7 +1,7 @@
 import { Empty } from "@utils";
-import { Button } from "@intrinsic/button";
 import type { FileHarborStateItemTransfer } from "@commonTypes/fileHarbour";
 import { useFileHarbour } from "@components/content/fileHarbour/fileHarbourContext";
+import { Button } from "@components/intrinsic/button";
 
 function getInitials(tag: string): string {
   return tag

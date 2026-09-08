@@ -17,10 +17,11 @@
   padding: 24px;
   display: grid;
   place-items: center;
+  box-sizing: border-box;
   opacity: 0;
   background: rgba(9, 11, 16, 0);
   backdrop-filter: blur(0);
-  box-sizing: border-box;
+
   pointer-events: none;
   transition:
     opacity 180ms ease,
@@ -37,8 +38,11 @@
 
 .modal__dialog {
   width: min(100%, 520px);
-  max-height: min(100%, 680px);
-  overflow: auto;
+  max-height: min(100%, 800px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   color: rgba(248, 251, 255, 0.93);
@@ -68,13 +72,12 @@
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   background-color: rgba(255, 255, 255, 0.025);
-  box-sizing: border-box;
 }
 
 .modal__content {
+  min-height: 0;
   padding: 22px;
-  line-height: 1.5;
-  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 @media (max-width: 560px) {

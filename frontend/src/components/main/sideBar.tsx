@@ -1,4 +1,3 @@
-import { Form, FormSchema } from "@components/form/form";
 import { Button } from "@components/intrinsic/button";
 import { Modal } from "@components/modal/modal";
 import { createContext, useContext, useState } from "react";
@@ -9,7 +8,9 @@ import {
   portFormValidator,
   tagFormValidator,
 } from "@components/content/fileHarbour/commonFormValidators";
-import { showToastMessage } from "@components/toast/toast";
+import { DataForm, GFI, GridGroup } from "formutate";
+import { componentFactory } from "@components/intrinsic/componentFactory";
+import { dataFormDefaultStyle } from "@components/utils";
 
 export interface SideBarProps {
   header?: React.ReactNode;
@@ -96,8 +97,10 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
         open={configModalOpen}
         onClose={() => setConfigModalOpen(false)}
       >
-        <Form<FormSchema<GlobalAppConfig>>
+        <DataForm
+          componentFactory={componentFactory}
           initialData={config as any}
+          gridStyle={{ ...dataFormDefaultStyle }}
           schema={{
             selfTag: {
               component: "input",
@@ -126,7 +129,14 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
             saveConfig(data as any);
             setConfigModalOpen(false);
           }}
-        />
+        >
+          <GridGroup header="Client configuration">{GFI("selfTag")}</GridGroup>
+          <GridGroup header="Relay configuration">
+            {GFI("relayAddr")}
+            {GFI("relayPort")}
+          </GridGroup>
+          <GridGroup header="Miscellaneous">{GFI("encrypt")}</GridGroup>
+        </DataForm>
       </Modal>
       <Button
         onClick={async () => {

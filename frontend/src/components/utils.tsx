@@ -1,3 +1,5 @@
+import { ComponentProps, CSSProperties } from "react";
+
 export const Empty: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
   <div
     style={{
@@ -12,3 +14,7 @@ export const Empty: React.FC<React.PropsWithChildren<{}>> = ({ children }) => (
     {children}
   </div>
 );
+
+export const dataFormDefaultStyle: CSSProperties = {
+  gap: 16,
+};

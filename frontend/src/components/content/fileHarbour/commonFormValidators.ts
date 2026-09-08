@@ -1,4 +1,4 @@
-import { ItemDescriptor } from "@components/form/form";
+import { ItemDescriptor } from "formutate";
 
 export const tagFormValidator: ItemDescriptor["validator"] = (
   value: string

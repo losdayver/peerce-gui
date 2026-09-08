@@ -3,7 +3,6 @@ import type { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
 import type { ContentWindowHeaderAction } from "@main/sideBar";
 import { Modal } from "@modal/modal";
 import { useFileHarbour } from "./fileHarbourContext";
-import { Form, type FormSchema, type InferDataFromSchema } from "@form/form";
 import { useApp } from "@components/main/app";
 import { GlobalAppConfig } from "@commonTypes/app";
 import {
@@ -13,6 +12,15 @@ import {
 } from "./commonFormValidators";
 import { showToastMessage } from "@components/toast/toast";
 import { FileHarborCurrentPeerInfo } from "@commonTypes/fileHarbour";
+import {
+  DataForm,
+  FormSchema,
+  GFI,
+  GridGroup,
+  InferDataFromSchema,
+} from "formutate";
+import { componentFactory } from "@components/intrinsic/componentFactory";
+import { dataFormDefaultStyle } from "@components/utils";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "📄 Peer info", fn: null },
@@ -36,7 +44,6 @@ const addPeerFormSchema = {
   aggressive: {
     title: "Aggressive mode",
     component: "checkbox",
-    divideAfter: true,
     hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
@@ -49,7 +56,6 @@ const addPeerFormSchema = {
   selfPort: {
     title: "Self port",
     component: "inputNum",
-    divideAfter: true,
     validator: portFormValidator,
     hint: "If you want to bind your udp socket to a specific port",
   },
@@ -138,10 +144,7 @@ export const FileHarbourActions: React.FC = () => {
             aria-label="Local peer identity"
           >
             <header className="file-harbour__peer-info-summary">
-              <span
-                className="file-harbour__peer-info-mark"
-                aria-hidden="true"
-              >
+              <span className="file-harbour__peer-info-mark" aria-hidden="true">
                 ID
               </span>
               <div className="file-harbour__peer-info-heading">
@@ -194,10 +197,17 @@ export const FileHarbourActions: React.FC = () => {
         title="Add new peer"
         open={addPeerModalOpen}
         onClose={() => setAddPeerModalOpen(false)}
+        style={{ width: "600px" }}
       >
-        <Form
+        <DataForm
+          componentFactory={componentFactory}
           schema={addPeerFormSchema}
-          initialData={config as any}
+          initialData={config}
+          gridStyle={{
+            ...dataFormDefaultStyle,
+            gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr));",
+            gridAutoColumns: "unset",
+          }}
           customValidate={({ distantTag, selfTag }) => {
             if (distantTag == selfTag)
               return [
@@ -217,7 +227,24 @@ export const FileHarbourActions: React.FC = () => {
               showToastMessage({ title: "🔌 New peer registered" });
             }
           }}
-        />
+        >
+          <GridGroup header="Tags">
+            {GFI("selfTag")}
+            {GFI("distantTag")}
+          </GridGroup>
+          <GridGroup header="Socket binding">
+            {GFI("selfAddr")}
+            {GFI("selfPort")}
+          </GridGroup>
+          <GridGroup header="Relay configuration">
+            {GFI("relayAddr")}
+            {GFI("relayPort")}
+          </GridGroup>
+          <GridGroup split header="Miscellaneous">
+            {GFI("aggressive")}
+            {GFI("encrypt")}
+          </GridGroup>
+        </DataForm>
       </Modal>
     </>
   );

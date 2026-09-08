@@ -19,13 +19,15 @@ import type {
 } from "@commonTypes/wsMessage.js";
 import { wsClientContext } from "@interop/wsClient";
 import { Modal } from "@modal/modal";
-import { Form, type FormSchema } from "@form/form";
 import { showToastMessage } from "@components/toast/toast";
 import {
   addressFormValidator,
   portFormValidator,
   tagFormValidator,
 } from "./commonFormValidators";
+import { DataForm, FormSchema, GFI, GridGroup } from "formutate";
+import { componentFactory } from "@components/intrinsic/componentFactory";
+import { dataFormDefaultStyle } from "@components/utils";
 
 const transferFormSchema = {
   fullFilePath: { component: "file", title: "File", required: true },
@@ -49,7 +51,6 @@ const editPeerFormSchema = {
   aggressive: {
     component: "checkbox",
     title: "Aggressive mode",
-    divideAfter: true,
     hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
@@ -61,7 +62,6 @@ const editPeerFormSchema = {
   selfPort: {
     component: "inputNum",
     title: "Self port",
-    divideAfter: true,
     validator: portFormValidator,
     hint: "If you want to bind your udp socket to a specific port",
   },
@@ -231,9 +231,15 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
         onClose={() => setEditingPeerTag(null)}
         open={editingPeerTag !== null}
         title="Edit peer"
+        style={{ width: "600px" }}
       >
-        <Form
+        <DataForm
+          componentFactory={componentFactory}
           schema={editPeerFormSchema}
+          gridStyle={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr));",
+            ...dataFormDefaultStyle,
+          }}
           initialData={{
             selfTag: editingPeer?.selfTag ?? "",
             distantTag: editingPeer?.tag ?? "",
@@ -258,14 +264,32 @@ export function FileHarbourProvider({ children }: PropsWithChildren) {
             wsClient?.sendMessage(message);
             setEditingPeerTag(null);
           }}
-        />
+        >
+          <GridGroup header="Tags">
+            {GFI("selfTag")}
+            {GFI("distantTag")}
+          </GridGroup>
+          <GridGroup header="Socket binding">
+            {GFI("selfAddr")}
+            {GFI("selfPort")}
+          </GridGroup>
+          <GridGroup header="Relay configuration">
+            {GFI("relayAddr")}
+            {GFI("relayPort")}
+          </GridGroup>
+          <GridGroup split header="Miscellaneous">
+            {GFI("aggressive")}
+            {GFI("encrypt")}
+          </GridGroup>
+        </DataForm>
       </Modal>
       <Modal
         onClose={closeTransferModal}
         open={transferModalOpen}
         title="Transfer new file"
       >
-        <Form
+        <DataForm
+          componentFactory={componentFactory}
           schema={transferFormSchema}
           onConfirm={(data) => {
             const fullFilePath = data.fullFilePath;
