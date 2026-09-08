@@ -3,7 +3,6 @@ import type { WSFHRegisterPeerMessage } from "@commonTypes/wsMessage.js";
 import type { ContentWindowHeaderAction } from "@main/sideBar";
 import { Modal } from "@modal/modal";
 import { useFileHarbour } from "./fileHarbourContext";
-import { Form, type FormSchema, type InferDataFromSchema } from "@form/form";
 import { useApp } from "@components/main/app";
 import { GlobalAppConfig } from "@commonTypes/app";
 import {
@@ -13,6 +12,8 @@ import {
 } from "./commonFormValidators";
 import { showToastMessage } from "@components/toast/toast";
 import { FileHarborCurrentPeerInfo } from "@commonTypes/fileHarbour";
+import { DataForm, FormSchema, InferDataFromSchema } from "formutate";
+import { componentFactory } from "@components/intrinsic/componentFactory";
 
 export const fileHarbourHeaderActions: ContentWindowHeaderAction[] = [
   { title: "📄 Peer info", fn: null },
@@ -36,7 +37,6 @@ const addPeerFormSchema = {
   aggressive: {
     title: "Aggressive mode",
     component: "checkbox",
-    divideAfter: true,
     hint: "Upon request timeout will try again and again indefinitely",
   },
   selfAddr: {
@@ -49,7 +49,6 @@ const addPeerFormSchema = {
   selfPort: {
     title: "Self port",
     component: "inputNum",
-    divideAfter: true,
     validator: portFormValidator,
     hint: "If you want to bind your udp socket to a specific port",
   },
@@ -138,10 +137,7 @@ export const FileHarbourActions: React.FC = () => {
             aria-label="Local peer identity"
           >
             <header className="file-harbour__peer-info-summary">
-              <span
-                className="file-harbour__peer-info-mark"
-                aria-hidden="true"
-              >
+              <span className="file-harbour__peer-info-mark" aria-hidden="true">
                 ID
               </span>
               <div className="file-harbour__peer-info-heading">
@@ -195,7 +191,8 @@ export const FileHarbourActions: React.FC = () => {
         open={addPeerModalOpen}
         onClose={() => setAddPeerModalOpen(false)}
       >
-        <Form
+        <DataForm
+          componentFactory={componentFactory}
           schema={addPeerFormSchema}
           initialData={config as any}
           customValidate={({ distantTag, selfTag }) => {

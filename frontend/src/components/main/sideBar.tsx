@@ -1,4 +1,3 @@
-import { Form, FormSchema } from "@components/form/form";
 import { Button } from "@components/intrinsic/button";
 import { Modal } from "@components/modal/modal";
 import { createContext, useContext, useState } from "react";
@@ -9,7 +8,8 @@ import {
   portFormValidator,
   tagFormValidator,
 } from "@components/content/fileHarbour/commonFormValidators";
-import { showToastMessage } from "@components/toast/toast";
+import { DataForm } from "formutate";
+import { componentFactory } from "@components/intrinsic/componentFactory";
 
 export interface SideBarProps {
   header?: React.ReactNode;
@@ -96,7 +96,8 @@ export const SideBarFooter: React.FC<SideBarFooterProps> = () => {
         open={configModalOpen}
         onClose={() => setConfigModalOpen(false)}
       >
-        <Form<FormSchema<GlobalAppConfig>>
+        <DataForm
+          componentFactory={componentFactory}
           initialData={config as any}
           schema={{
             selfTag: {
