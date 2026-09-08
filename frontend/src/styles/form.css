@@ -311,15 +311,10 @@
     border-color 150ms ease;
 }
 
-.lsdvrform-intrinsic-checkbox:not(:disabled):hover {
-  border-color: rgba(255, 255, 255, 0.28);
-  background-color: rgba(255, 255, 255, 0.09);
-}
-
 .lsdvrform-intrinsic-checkbox:checked {
   border-color: rgba(118, 228, 180, 0.8);
   background-color: #76e4b4;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3.25 8.25 2.85 2.85 6.65-6.45' fill='none' stroke='%2317191f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2'/%3E%3C/svg%3E");
+  background-image: url("../static/check.svg?no-inline");
 }
 
 .lsdvrform-intrinsic-checkbox:focus-visible {
